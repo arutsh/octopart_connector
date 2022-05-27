@@ -1,8 +1,10 @@
 {
-    "name": "Octopart API",
-    "version": "0.1",
+    "name": "Octopart Connector",
+    "version": "1",
     "summary": "Module links products with octopart component name and check stock availability",
     "author": "Norair Arutshyan",
+    'category': 'Inventory',
+    'website': 'http://www.toolkit.tools/',
     "depends": [
         "base",
         'web',
