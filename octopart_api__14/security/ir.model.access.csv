@@ -1,0 +1,6 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_octopart_parts,access_octopart_parts,model_octopart_parts,base.group_user,1,1,1,1
+access_octopart_parts_availability,access_octopart_parts_availability,model_octopart_parts_availability,base.group_user,1,1,1,1
+access_octopart_parts_manufacturers,access_octopart_parts_manufacturers,model_octopart_parts_manufacturers,base.group_user,1,1,1,1
+access_octopart_parts_vendors,access_octopart_parts_vendors,model_octopart_parts_vendors,base.group_user,1,1,1,1
+access_octopart_parts_vendors_category,access_octopart_parts_vendors_category,model_octopart_parts_vendors_category,base.group_user,1,1,1,1

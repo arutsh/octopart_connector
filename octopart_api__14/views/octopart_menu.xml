@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<odoo>
+  <menuitem id="octopart_parts_menu_root"
+            name="Octopart_api"
+            web_icon="octopart_api,static/description/icon.png">
+    <menuitem id="octopart_first_level_menu" name="Octopart API First Level">
+        <menuitem id="octopart_parts_menu_action" action="octopart_parts_action"/>
+        <menuitem id="octopart_parts_availibility_menu_action" action="octopart_parts_availability_action"/>
+        <menuitem id="octopart_parts_manufacturers_menu_action" action="octopart_parts_manufacturers_action"/>
+        <menuitem id="octopart_parts_vendors_menu_action" action="octopart_parts_vendors_action"/>
+        <menuitem id="octopart_parts_vendors_category_menu_action" action="octopart_parts_vendors_category_action"/>
+        <menuitem id="octopart_mrp_bom_structure_action" action="action_report_mrp_bom_octopart"/>
+    </menuitem>
+  </menuitem>
+
+  <menuitem id="octopart_api_configuration"
+            name="Configurations"
+            parent="octopart_parts_menu_root"
+            sequence="100"/>
+
+  <menuitem id="octopart_api_configuration_settings"
+            name="Settings"
+            parent="octopart_api_configuration"
+            action="octopart_api_settings_action"
+            sequence="10"/>
+</odoo>

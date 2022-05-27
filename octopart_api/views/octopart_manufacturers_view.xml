@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<odoo>
+  <record id="octopart_parts_manufacturers_action" model="ir.actions.act_window">
+      <field name="name">Manufacturers</field>
+      <field name="res_model">octopart.parts.manufacturers</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'search_default_available': True}</field>
+  </record>
+
+ <record id="octopart_parts_manufacturers_view_tree" model="ir.ui.view">
+    <field name="name">octopart.parts.manufacturers.tree</field>
+    <field name="model">octopart.parts.manufacturers</field>
+    <field name="arch" type="xml">
+      <tree string="Octopart Manufacturers">
+        <field name="manufacturer_id"/>
+        <field name="name"/>
+      </tree>
+    </field>
+  </record>
+
+ <record id="octopart_parts_manufacturers_view_form" model="ir.ui.view">
+    <field name="name">octopart.parts.manufacturers.form</field>
+    <field name="model">octopart.parts.manufacturers</field>
+    <field name="arch" type="xml">
+      <form string="Property Form">
+        <sheet>
+          <group>
+            <field name="manufacturer_id"/>
+            <field name="name"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+   </record>
+
+</odoo>
