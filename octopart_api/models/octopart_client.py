@@ -2,7 +2,7 @@ from six.moves import urllib
 import json
 import os
 
-# copy pasted from: https://github.com/prisma-labs/python-graphql-client/blob/master/graphqlclient/client.py
+# copied from: https://github.com/prisma-labs/python-graphql-client/blob/master/graphqlclient/client.py
 class OctoPartClient:
     def __init__(self, endpoint):
         self.endpoint = endpoint
@@ -43,7 +43,7 @@ def search_mpn(client, mpn, currency):
 
     query = '''
     query MyPartSearch ($q: String!, $curr: String!, $country: String!){
-   search(q: $q, currency: $curr, country: $country) {
+    search(q: $q, currency: $curr, country: $country) {
      hits
      results {
        part {
@@ -123,8 +123,6 @@ def match_mpns(client, mpns):
     return json.loads(resp)['data']['multi_match']
 
 def demo_match_mpns(client, mpn):
-    print('\n---------------- demo_match_mpns')
-
 
     mpns = [
         str(mpn),
@@ -139,7 +137,6 @@ def demo_match_mpns(client, mpn):
     return matches
 
 def demo_search_mpn(client, mpn, currency):
-    print('\n---------------- demo_search_mpn_____')
 
     matches = search_mpn(client, mpn, currency)
     #print(matches)

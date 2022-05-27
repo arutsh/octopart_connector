@@ -21,6 +21,7 @@
         <field name="price" widget="monetary"/>
         <field name="batch_qty"/>
         <field name="offer_url" widget="html"/>
+        <field name="seller_status"/>
       </tree>
     </field>
   </record>

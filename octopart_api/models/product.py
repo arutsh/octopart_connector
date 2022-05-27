@@ -18,16 +18,17 @@ class ProductTemplate(models.Model):
     manufacturers_ids = fields.Many2many('octopart.parts.manufacturers', 'manufacturer_id')
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True)
-    min_price = fields.Monetary(currency_field='currency_id', string="Min Price", compute="_compute_min_price")
-    max_price = fields.Monetary(currency_field='currency_id', string="Max Price", compute="_compute_max_price")
-    avg_price = fields.Monetary(currency_field='currency_id', compute="_compute_avg_price", string = "Avg Price")
+    min_price = fields.Monetary(currency_field='currency_id', string="Min Price", compute="_compute_min_price", help="Min price during last 30 days based on retrieved data from octopart")
+    max_price = fields.Monetary(currency_field='currency_id', string="Max Price", compute="_compute_max_price", help="Max price during last 30 days based on retrieved data from octopart")
+    avg_price = fields.Monetary(currency_field='currency_id', compute="_compute_avg_price", string = "Avg Price", help="Avg price during last 30 days based on retrieved data from octopart")
     octopart_linked = fields.Boolean(default=False, string="Link to Octopart", compute="_compute_link_status")
-    last_available_stock = fields.Many2one("octopart.parts.availability", "avail_id", compute="_compute_last_available_stock")
+    last_available_stock = fields.Many2one("octopart.parts.availability", "Available Component", compute="_compute_last_available_stock")
 
-    last_available_stock_qty = fields.Integer(string="available qty", readonly=True, compute="_compute_last_available_stock")
-    last_available_stock_url = fields.Char(string="offer url", readonly=True, compute="_compute_last_available_stock")
+    last_available_stock_qty = fields.Integer(string="Available qty", readonly=True, compute="_compute_last_available_stock", help="Cheapest available component part#")
+    last_available_stock_url = fields.Char(string="Offered by", readonly=True, compute="_compute_last_available_stock", help="Qty of cheapest available stock")
 
-    seller_category_ids = fields.Many2many('octopart.parts.vendors.category', string="Category")
+    seller_category_ids = fields.Many2many('octopart.parts.vendors.category', string="Category",
+                                            help="Filter component by supplier categories. Categories has to be defined by admin from Octopart module page")
 
     def set_category_domain(self, record):
         domain = []
@@ -41,6 +42,7 @@ class ProductTemplate(models.Model):
                 step = step + 1
 
         return domain
+
 
     # def _update_category_ids(self):
     #     _logger.info("OCTPART PRODUCTs: _update_category_ids")
@@ -69,6 +71,7 @@ class ProductTemplate(models.Model):
                         record.last_available_stock = i.last_available_stock
                         dt = record.last_available_stock.date
                         qty = record.last_available_stock_qty
+
 
                         record.last_available_stock_qty = i.last_available_stock_qty
                         record.last_available_stock_url = i.last_available_stock_url

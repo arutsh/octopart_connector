@@ -9,27 +9,31 @@
             <field name="arch" type="xml">
               <xpath expr="//page[@name='inventory']" position="after">
                   <page  string="Octopart">
+
+                      <field name="octopart_linked" invisible='1' />
                       <group>
-                        <field name="octopart_linked" invisible='0' />
+                      <group attrs="{'invisible':[('octopart_linked','!=', True)]}">
+                            <field name="min_price" />
+                            <field name="max_price" />
+                            <field name="avg_price" />
                       </group>
                       <group attrs="{'invisible':[('octopart_linked','!=', True)]}">
-                          <button name="check_availability" string="Check availabilty" type="object"/>
+                            <field name="manufacturers_ids"  widget="many2many_tags" string="Manufacturers" invisible="1"/>
+                            <field name="seller_category_ids" widget="many2many_tags" />
+                            <field name="last_available_stock" />
+                            <field name="last_available_stock_qty" />
+                            <field name="last_available_stock_url" string="Offered by" widget="html" readonly="1" />
                       </group>
-                      <group attrs="{'invisible':[('octopart_linked','!=', True)]}">
-                          <field name="min_price" />
-                          <field name="max_price" />
-                          <field name="avg_price" />
-                          <field name="manufacturers_ids"  widget="many2many_tags" string="Manufacturers"/>
-                          <field name="seller_category_ids" widget="many2many_tags" />
-                          <field name="last_available_stock" />
-                          <field name="last_available_stock_qty" />
-                          <field name="last_available_stock_url" widget="html" readonly="1" />
-                        </group>
-                        <group>
+                      </group>
+                      <group>
                           <field name="linked_part_ids" nolabel="1"/>
-                        </group>
+                      </group>
 
                   </page>
+              </xpath>
+              <xpath expr="//header" position="inside" >
+                <button name="check_availability" string="Check availabilty on Octopart" type="object"
+                  attrs="{'invisible':[('octopart_linked','!=', True)]}"/>
               </xpath>
             </field>
       </record>

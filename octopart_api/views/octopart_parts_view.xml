@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <odoo>
-  <record id="octopart_parts_action" model="ir.actions.act_window">
+  <record id="octopart_parts_action" model="ir.actions.act_window" >
       <field name="name">Parts</field>
       <field name="res_model">octopart.parts</field>
       <field name="view_mode">tree,form</field>
@@ -10,6 +10,7 @@
  <record id="octopart_parts_view_tree" model="ir.ui.view">
     <field name="name">octopart.parts.tree</field>
     <field name="model">octopart.parts</field>
+    <field name="groups_id" eval="[(4, ref('stock.group_stock_manager'))]"/>
     <field name="arch" type="xml">
       <tree string="Octppart parts tree">
         <field name="name"/>
@@ -53,8 +54,7 @@
                 <field name="manufacturer_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="octopart_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="date" attrs="{'readonly': [('id', '!=', False)]}"/>
-                <!-- TODO:  hide this field for final app-->
-                <field name="part_id" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="part_id" attrs="{'readonly': [('id', '!=', False)]}" invisible="1"/>
               </group>
               <group>
                 <h1><field name="image" widget="html"  attrs="{'readonly': [('id', '!=', False)]}"/></h1>
@@ -84,6 +84,7 @@
                       <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                       <field name="batch_qty"/>
                       <field name="offer_url" widget="html" readonly="1"/>
+                      <field name="seller_status"/>
                     </tree>
                 </field>
               </group>

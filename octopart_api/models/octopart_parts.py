@@ -51,6 +51,7 @@ class OctoPartParts(models.Model):
     #]
 
 
+
     def _update_category_ids(self, seller_category_ids):
         _logger.info("OCTPART PARTS: @api.onchange seller_category_ids")
         self.seller_category_ids = seller_category_ids
@@ -346,6 +347,6 @@ class OctoPartParts(models.Model):
         #    return True
         for record in self:
             if (record.avail_ids):
-                raise UserError('You can not delete Part, if there availability parts associated with it. Please delete availability list first')
+                raise UserError('You can not delete Part, if there are availability parts associated with it. Please delete availability list first')
                 return True
         return super().unlink()

@@ -1,7 +1,7 @@
 {
     "name": "Octopart API",
     "version": "0.1",
-    "summary": "Module to link parts with octopart",
+    "summary": "Module links products with octopart component name and check stock availability",
     "author": "Norair Arutshyan",
     "depends": [
         "base",

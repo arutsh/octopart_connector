@@ -31,6 +31,7 @@ class OctoPartAvailability(models.Model):
     currency = fields.Char(string="Vendor Currency", readonly=True)
     batch_qty = fields.Integer(string="Min QTY", readonly=True)
     seller_category_ids = fields.Many2one('octopart.parts.vendors.category', related="seller.category_id")
+    seller_status = fields.Boolean(related="seller.confirmed_vendor")
 
     @api.onchange("stock_level")
     def _update_stock_avail(self):
