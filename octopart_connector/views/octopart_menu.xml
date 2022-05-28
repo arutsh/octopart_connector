@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <odoo>
   <menuitem id="octopart_parts_menu_root"
-            name="Octopart_api"
+            name="Octopart Connector"
             groups="stock.group_stock_manager"
-            web_icon="octopart_api,static/description/icon.png">
+            web_icon="Octopart Connector,static/description/icon.png">
     <menuitem id="octopart_first_level_menu" name="Octopart Connector" groups="stock.group_stock_manager">
         <menuitem id="octopart_parts_menu_action" action="octopart_parts_action" groups="stock.group_stock_manager"/>
         <menuitem id="octopart_parts_availibility_menu_action" action="octopart_parts_availability_action"/>
@@ -13,14 +13,14 @@
     </menuitem>
   </menuitem>
 
-  <menuitem id="octopart_api_configuration"
+  <menuitem id="octopart_connector_configuration"
             name="Configurations"
             parent="octopart_parts_menu_root"
             sequence="100"/>
 
-  <menuitem id="octopart_api_configuration_settings"
+  <menuitem id="octopart_connector_configuration_settings"
             name="Settings"
-            parent="octopart_api_configuration"
-            action="octopart_api_settings_action"
+            parent="octopart_connector_configuration"
+            action="octopart_connector_settings_action"
             sequence="10"/>
 </odoo>

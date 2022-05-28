@@ -7,7 +7,7 @@ from pathlib import Path
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
-from odoo.addons.octopart_api.models.octopart_client import OctoPartClient, demo_match_mpns, demo_search_mpn
+from odoo.addons.octopart_connector.models.octopart_client import OctoPartClient, demo_match_mpns, demo_search_mpn
 from datetime import date, datetime, time, timedelta
 
 _logger = logging.getLogger(__name__)
@@ -243,8 +243,8 @@ class OctoPartParts(models.Model):
         _logger.info("OCTOPART PARTS: ___selecting value")
         # client = OctoPartClient('https://octopart.com/api/v4/endpoint')
         # client.inject_token('10d26abe-cb84-476c-b2b7-a18b60ef3312')
-        token = self.env['ir.config_parameter'].sudo().get_param('octopart_api.api_token')
-        endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_api.client_url')
+        token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
+        endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
         client = OctoPartClient(endpoint)
         client.inject_token(token)
         mpn = self.name
@@ -285,8 +285,8 @@ class OctoPartParts(models.Model):
             _logger.info("OCTOPART PARTS: __adding values")
             # client = OctoPartClient('https://octopart.com/api/v4/endpoint')
             # client.inject_token('10d26abe-cb84-476c-b2b7-a18b60ef3312')
-            token = self.env['ir.config_parameter'].sudo().get_param('octopart_api.api_token')
-            endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_api.client_url')
+            token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
+            endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
             client = OctoPartClient(endpoint)
             client.inject_token(token)
             mpn = self.name

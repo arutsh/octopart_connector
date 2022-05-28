@@ -63,22 +63,5 @@
       </form>
     </field>
    </record>
-<!--
 
-      <record id="res_users_form_properties_extended" model="ir.ui.view">
-          <field name="name">res.users.form</field>
-          <field name="model">res.users</field>
-          <field name="inherit_id" ref="base.view_users_form"/>
-          <field name="arch" type="xml">
-           <xpath expr="//page[@name='references']" position="after">
-                <page string="Properties" name="properties">
-                 <group>
-                  <group string="Property List" name="property_list">
-                     <field name="property_ids" />
-                  </group>
-                 </group>
-                </page>
-              </xpath>
-          </field>
-      </record> -->
 </odoo>

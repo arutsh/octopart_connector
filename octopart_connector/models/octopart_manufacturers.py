@@ -4,7 +4,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
-from odoo.addons.octopart_api.models.octopart_client import OctoPartClient, demo_match_mpns, demo_search_mpn
+from odoo.addons.octopart_connector.models.octopart_client import OctoPartClient, demo_match_mpns, demo_search_mpn
 
 
 class OctoPartManufacturers(models.Model):

@@ -8,7 +8,7 @@
 * Checks stock availability for the linked parts
 * Computes Min cost of the product based on the data retrieved from octopart
 * Stores all historical prices on odoo for future reports
-* Allowes to create Group of Vendors (e.g. Manufacturer, Authorised distributer, etc...) and group vendors
+* Allows to create Group of Vendors (e.g. Manufacturer, Authorised distributor, etc...) and group vendors
 
 
 
@@ -23,10 +23,10 @@ Octopart Connector>configuration
 User Access Level
 =================
 
-App has to access level
-* internal user 
+App has 2 access level
+* internal user
 > all odoo user can see octopart tab on the product template page and link part to octopart if they have right to create/update product
-* Invenetory administrator
+* Inventory administrator
 > * Have access to App page Octopart Connector
 > * Can configure the app
 > * Create Vendor Groups
@@ -39,8 +39,8 @@ App has to access level
 Known issues / Roadmap
 ======================
 
-* 28-05-2022: The app does not link product varients to octopart
-* Stock is checked only once per day. meaning if user click on check stock availability today, first time it will retrieve data but will not update any more during the day. This limitation is set to prevent too much requests to Octopart.
+* 28-05-2022: The app does not link product variants to octopart
+* 28-05-2022: Stock is checked only once per day. meaning if user click on check stock availability today, first time it will retrieve data but will not update any more during the day. This limitation is set to prevent too much requests to Octopart.
 
 Bug Tracker
 ===========
@@ -59,3 +59,4 @@ Authors
 ~~~~~~~
 
 * Arutshyan - ToolKit
+* n.arutshyan(at)gmail.com

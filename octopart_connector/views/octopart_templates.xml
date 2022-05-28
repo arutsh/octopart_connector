@@ -2,8 +2,8 @@
 <odoo>
     <template id="assets_octopart_backend" name="octopart assets" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
-            <link rel="stylesheet" type="text/scss" href="/octopart_api/static/src/scss/mrp_workorder_kanban.scss" />
-            <script type="text/javascript" src="/octopart_api/static/src/js/mrp_bom_report_octopart.js"></script>
+            <link rel="stylesheet" type="text/scss" href="/octopart_connector/static/src/scss/mrp_workorder_kanban.scss" />
+            <script type="text/javascript" src="/octopart_connector/static/src/js/mrp_bom_report_octopart.js"></script>
         </xpath>
    </template>
 </odoo>

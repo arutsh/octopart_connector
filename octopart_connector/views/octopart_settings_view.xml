@@ -8,8 +8,8 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="Octopart Connector" string="Octopart Connector" data-key="octopart_api">
-                    <h2> Octopart Settings</h2>
+                <div class="app_settings_block" data-string="Octopart Connector" string="Octopart Connector" data-key="octopart_connector">
+                    <h2> Octopart API Settings</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="o_setting_left_pane">
                           <label for="client_url" string="Octopart Client URL"/>
@@ -24,13 +24,13 @@
     </record>
 
 
-  <record id="octopart_api_settings_action" model="ir.actions.act_window">
+  <record id="octopart_connector_settings_action" model="ir.actions.act_window">
       <field name="name">Octopart Settings</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">res.config.settings</field>
       <field name="view_id" ref='res_config_settings_view_form'/>
       <field name="view_mode">form</field>
       <field name="target">inline</field>
-      <field name="context">{'module': 'octopart_api'}</field>
+      <field name="context">{'module': 'octopart_connector'}</field>
   </record>
 </odoo>
