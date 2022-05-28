@@ -8,7 +8,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="Octopart Api" string="Octopart Api" data-key="octopart_api">
+                <div class="app_settings_block" data-string="Octopart Connector" string="Octopart Connector" data-key="octopart_api">
                     <h2> Octopart Settings</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="o_setting_left_pane">
