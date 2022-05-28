@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<odoo>
+  <record id="octopart_parts_action" model="ir.actions.act_window" >
+      <field name="name">Parts</field>
+      <field name="res_model">octopart.parts</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'search_default_available': True}</field>
+  </record>
+
+ <record id="octopart_parts_view_tree" model="ir.ui.view">
+    <field name="name">octopart.parts.tree</field>
+    <field name="model">octopart.parts</field>
+    <field name="groups_id" eval="[(4, ref('stock.group_stock_manager'))]"/>
+    <field name="arch" type="xml">
+      <tree string="Octppart parts tree">
+        <field name="name"/>
+        <field name="description"/>
+        <field name="date"/>
+        <field name="manufacturer"/>
+        <field name="manufacturer_url" widget="html"/>
+
+      </tree>
+    </field>
+  </record>
+
+  <record id="octopart_parts_view_search" model="ir.ui.view">
+    <field name="name">octopart.parts.search</field>
+    <field name="model">octopart.parts</field>
+    <field name="arch" type="xml">
+      <search string="Parts Search">
+        <field name="name"/>
+        <field name="description"/>
+        <field name="date"/>
+        <field name="manufacturer"/>
+        <group expand="1" string="Group By">
+          <filter string="Manufacturer" name="manufacturer" context="{'group_by':'manufacturer'}"/>
+        </group>
+      </search>
+    </field>
+  </record>
+
+ <record id="octopart_parts_view_form" model="ir.ui.view">
+    <field name="name">octopart.parts.form</field>
+    <field name="model">octopart.parts</field>
+    <field name="arch" type="xml">
+      <form string="Property Form">
+        <sheet>
+            <group>
+              <group>
+                <h1>  <field name="name" attrs="{'readonly': [('id', '!=', False)]}"/> </h1>
+                <field name="linked_part_id" invisible='1' />
+                <field name="currency_id" invisible='1'/>
+                <field name="manufacturer" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="manufacturer_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="octopart_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="date" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="part_id" attrs="{'readonly': [('id', '!=', False)]}" invisible="1"/>
+              </group>
+              <group>
+                <h1><field name="image" widget="html"  attrs="{'readonly': [('id', '!=', False)]}"/></h1>
+              </group>
+
+            </group>
+          <notebook>
+            <page string="Description">
+              <group>
+                  <field name="description"/>
+              </group>
+            </page>
+            <page string="Availability">
+              <group>
+                  <button name="check_availability" string="Check availabilty" type="object"/>
+              </group>
+              <group>
+                  <field name="avail_ids" nolabel="1" >
+                    <tree decoration-success="stock_avail=='true'">
+                      <field name="currency_id" invisible="1" />
+                      <field name = "date"/>
+                      <field name = "name"/>
+                      <field name = "seller"/>
+                      <field name="moq"/>
+                      <field name="stock_level"/>
+                      <field name="stock_avail"/>
+                      <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                      <field name="batch_qty"/>
+                      <field name="offer_url" widget="html" readonly="1"/>
+                      <field name="seller_status"/>
+                    </tree>
+                </field>
+              </group>
+            </page>
+            <page string="Pricing">
+              <group>
+                  <button name="compute_min_price_button" string=" Update Prices" type="object"/>
+              </group>
+              <group>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <!-- TODO: show only list of sellers that are availebl domain="[('id', 'in', 'avail_ids.seller')]"?-->
+                <field name="seller_category_ids" widget="many2many_tags" />
+                <field name="max_moq"/>
+                <field name="min_price"/>
+                <field name="max_price"/>
+                <field name="avg_price"/>
+                <field name="last_available_stock_qty"/>
+                <field name="last_available_stock_url" widget="html"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <div class="oe_chatter">
+            <field name="message_follower_ids"/>
+            <field name="activity_ids"/>
+            <field name="message_ids"/>
+        </div>
+      </form>
+    </field>
+   </record>
+</odoo>
