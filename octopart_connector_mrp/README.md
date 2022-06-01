@@ -1,4 +1,4 @@
-# Octopart Connector
+# Octopart Connector MRP
 
 [![License: LGPL-3](https://img.shields.io/badge/licence-LGPL--3-blue.png)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
 [![Octopart connector MRP](https://img.shields.io/badge/github-Octopart%20Connector-brightgreen?logo=github)](https://github.com/arutsh/octopart_connector)

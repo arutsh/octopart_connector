@@ -360,23 +360,20 @@ ul.auto-toc {
 </head>
 <body>
 <div class="document" id="quality-control-oca">
-<h1 class="title">Octopart Connector</h1>
+<h1 class="title">Octopart Connector MRP</h1>
 
-<p> <a class="reference external" href="https://www.gnu.org/licenses/lgpl-3.0.en.html"><img alt="License: LGPL-3" src="https://img.shields.io/badge/licence-LGPL--3-blue.png" /></a> <a class="reference external" href="https://github.com/arutsh/octopart_connector"><img alt="Octopart connector" src="https://img.shields.io/badge/github-Octopart%20Connector-brightgreen?logo=github" /></a> </p>
+<p> <a class="reference external" href="https://www.gnu.org/licenses/lgpl-3.0.en.html"><img alt="License: LGPL-3" src="https://img.shields.io/badge/licence-LGPL--3-blue.png" /></a> <a class="reference external" href="https://github.com/arutsh/octopart_connector"><img alt="Octopart connector MRP" src="https://img.shields.io/badge/github-Octopart%20Connector%20MRP-brightgreen?logo=github" /></a> </p>
 <p>
   <ul class="simple">
-  <li>This module links odoo's inventory product to several part numbers on <a href="https://octopart.com/"> Octopart</a> .</li>
-  <li>Checks stock availability for the linked parts</li>
-  <li>Computes Min, Max and Avg cost of the product based on the data retrieved from octopart</li>
-  <li>Stores all historical prices on odoo for future reports</li>
-  <li>Allows to create Group of Vendors (e.g. Manufacturer, Authorised distributor, etc...) and group vendors</li>
-    </ul>
-  </p>
+    <li>This module enhances <a href="https://github.com/arutsh/octopart_connector/tree/15.0/octopart_connector/">Octopart Connector</a> App with additional functionality. </li>
+    <li>Shows stock availability for the linked component on manufacturing order.</li>
+    <li>Filters availability according to Vendor categories</li>
+  </ul>
+</p>
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#configuration" id="id1">Configuration</a></li>
-<li><a class="reference internal" href="#access_level" id="id1">User Access Level</a></li>
+<li><a class="reference internal" href="#dependencies" id="id1">Dependencies</a></li>
 <li><a class="reference internal" href="#known-issues-roadmap" id="id2">Known issues / Roadmap</a></li>
 <li><a class="reference internal" href="#bug-tracker" id="id3">Bug Tracker</a></li>
 <li><a class="reference internal" href="#authors" id="id5">Authors</a></li>
@@ -384,53 +381,22 @@ ul.auto-toc {
 </li>
 </ul>
 </div>
-<div class="section" id="configuration">
-<h1><a class="toc-backref" href="#id1">Configuration</a></h1>
-<div><p>
-To be able to use Octopart Connector app, you should get API token from Octopart.
-For more information please refer to <a href="https://octopart.com/api/v4/register"> Octopart </a> .
-Octopart Connector Retrieves only specs available for Basic version.
-</p>
-<p>
-Octopart Connector>configuration<br/>
-Octopart Client URL: https://octopart.com/api/v4/endpoint<br/>
-
-
-</p>
+<div class="section" id="dependencies">
+<h1><a class="toc-backref" href="#id1">Dependencies</a></h1>
+<div>
+<ul>
+  <li>Manufacturing</li>
+  <li>Octopart Connector </li>
+</ul>
 </div>
 
 <div class="section" id="access_level">
 <h1><a class="toc-backref" href="#id1">User Access Level</a></h1>
-<div><p>
 
-  App has 2 access level
-<ul class="simple">
-      <li>internal user</li>
-      <ul class="simple">
-            <li>all odoo user can see octopart tab on the product template page and link part to octopart if they have right to create/update product </li>
-      </ul>
-      <li>Invenetory administrator</li>
-      <ul class="simple">
-        <li>  Have access to App page Octopart Connector</li>
-        <li>  Can configure the app</li>
-        <li>  Create Vendor Groups</li>
-        <li>  Set Confirmed Vendors</li>
-        <li>  Link Vendor with existing Contact</li>
-        <li>  Access List of Available component history</li>
-      </ul>
-
-</ul>
-
-
-</p>
-</div>
 
 <div class="section" id="known-issues-roadmap">
 <h1><a class="toc-backref" href="#id2">Known issues / Roadmap</a></h1>
-<ul class="simple">
-<li>28-05-2022:  The app does not link product variants to octopart </li>
-<li>28-05-2022:  Stock is checked only once per day. meaning if user click on check stock availability today, first time it will retrieve data but will not update any more during the day. This limitation is set to prevent too much requests to Octopart.</li>
-</ul>
+
 </div>
 <div class="section" id="bug-tracker">
 <h1><a class="toc-backref" href="#id3">Bug Tracker</a></h1>
