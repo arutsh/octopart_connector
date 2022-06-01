@@ -20,4 +20,6 @@
     'images': [
       'static/description/thumbnail.png',
   ],
+      'license': 'LGPL-3',
+
 }
