@@ -27,6 +27,9 @@
 
     ],
     'qweb': ['static/src/xml/*.xml'],
+    'images': [
+      'static/description/thumbnail.png',
+    ],
     'license': 'LGPL-3',
 
 }

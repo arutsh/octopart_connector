@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Manufacturing Order -->
+        <record id="view_octopart_production_form_inherited" model="ir.ui.view">
+              <field name="name">production.form.octopart.inherited</field>
+              <field name="model">mrp.production</field>
+              <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+              <field name="arch" type="xml">
+                <xpath expr="//field[@name='move_line_ids']" position="before">
+                  <field name="octopart_linked" invisible="1"/>
+                  <field name="last_available_stock_qty" />
+                  <field name="last_available_stock_url" widget="html" readonly="1" />
+                </xpath>
+                <xpath  expr="//page[@name='miscellaneous']/group" position="after">
+                  <group>
+                    <field name="seller_category_ids" string="Vendor Category (Octopart)" widget="many2many_tags" help="If vendor category is set, then only available components from specified vendor's category will be shown in the bom list" />
+                  </group>
+                </xpath>
+                <xpath expr="//header" position="inside" >
+                  <button name="check_availability" string="Check on Octopart" type="object"/>
+                </xpath>
+              </field>
+        </record>
+    </data>
+</odoo>
