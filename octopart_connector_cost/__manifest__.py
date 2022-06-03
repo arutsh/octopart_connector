@@ -3,6 +3,8 @@
     "version": "0.1",
     "summary": "Enhances BOM cost and structure and shows Min, Max and Avg cost of the BOM",
     "author": "Norair Arutshyan",
+    'website': 'http://www.toolkit.tools/',
+    'category': 'MRP',
     "depends": [
         "octopart_connector"
     ],

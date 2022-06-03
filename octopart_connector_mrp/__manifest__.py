@@ -3,6 +3,8 @@
     "version": "0.1",
     "summary": "Manufacturing order shows octopart linked parts in BOM and checkes if there is stock availability for it",
     "author": "Norair Arutshyan",
+    'website': 'http://www.toolkit.tools/',
+    'category': 'MRP',
     "depends": [
         "octopart_connector",
         "mrp",
