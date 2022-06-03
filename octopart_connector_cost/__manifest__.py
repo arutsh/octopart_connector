@@ -1,7 +1,7 @@
 {
     "name": "Octopart Connector MRP Cost structure",
     "version": "0.1",
-    "summary": "Links product with Octopart",
+    "summary": "Enhances BOM cost and structure and shows Min, Max and Avg cost of the BOM",
     "author": "Norair Arutshyan",
     "depends": [
         "octopart_connector"
