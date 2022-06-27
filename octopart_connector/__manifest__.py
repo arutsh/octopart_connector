@@ -1,6 +1,6 @@
 {
     "name": "Octopart Connector",
-    "version": "1",
+    "version": "1.2",
     "summary": "Module links products with octopart component name and check stock availability",
     "author": "Norair Arutshyan",
     'category': 'Inventory',

@@ -27,6 +27,11 @@ class OctoPartParts(models.Model):
     description = fields.Text()
     octopart_url = fields.Char()
     image = fields.Char()
+    est_factory_lead_time = fields.Integer(string="Lead time", defualt=0)
+    #Returns already converted price for requested currency
+    median_price_1000_converted_currency = fields.Float(string="Median Price", default = 0, hint="Median price for 1000qty")
+    free_sample_url = fields.Char(string="Free sample")
+    datasheet_url = fields.Char(string="Datasheet")
     #TODO: default set to GBP manually, has to be match with company currency
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=147)
     linked_part_id = fields.Many2one('product.template', 'Link to Product')
@@ -44,11 +49,6 @@ class OctoPartParts(models.Model):
     last_available_stock_url = fields.Char(string="offer url", readonly=True, compute="_compute_last_available_stock")
 
     seller_category_ids = fields.Many2many('octopart.parts.vendors.category', string="Category")
-
-    #_sql_constraints = [
-    #    ('check_selling_price', 'CHECK(selling_price >= 0)',
-    #     'A property selling price must be positive.')
-    #]
 
 
 
@@ -241,12 +241,10 @@ class OctoPartParts(models.Model):
     @api.onchange('name')
     def _match_parts(self):
         _logger.info("OCTOPART PARTS: ___selecting value")
-        # client = OctoPartClient('https://octopart.com/api/v4/endpoint')
-        # client.inject_token('10d26abe-cb84-476c-b2b7-a18b60ef3312')
         token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
         endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
-        client = OctoPartClient(endpoint)
-        client.inject_token(token)
+        client = OctoPartClient(endpoint,token)
+
         mpn = self.name
         result = demo_match_mpns(client, str(mpn))
         for match in result:
@@ -270,6 +268,18 @@ class OctoPartParts(models.Model):
 
                     if part['best_image'] != None:
                         self.image = '<img src = "' + part['best_image']['url'] + '" width="150px">'
+
+                    if part['estimated_factory_lead_days'] != None:
+                        self.est_factory_lead_time = int(part['estimated_factory_lead_days']/7)
+
+                    if part['median_price_1000'] != None:
+                        self.median_price_1000_converted_currency = float(part['median_price_1000']['converted_price'])
+
+                    if part['free_sample_url'] != None:
+                        self.free_sample_url = '<a href="'+ part['free_sample_url']+'" target="_blank">Free Sample</a>'
+
+                    if part['best_datasheet'] != None:
+                        self.datasheet_url = '<a href="'+ part['best_datasheet']['url']+'" target="_blank">Datasheet</a>'
 
 
 

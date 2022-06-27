@@ -4,10 +4,10 @@ import os
 
 # copied from: https://github.com/prisma-labs/python-graphql-client/blob/master/graphqlclient/client.py
 class OctoPartClient:
-    def __init__(self, endpoint):
+    def __init__(self, endpoint, token, headername='token'):
         self.endpoint = endpoint
-        self.token = None
-        self.headername = None
+        self.token = token
+        self.headername = headername
 
     def execute(self, query, variables=None):
         return self._send(query, variables)
@@ -49,27 +49,64 @@ def search_mpn(client, mpn, currency):
        part {
          id
          mpn
+         manufacturer_url
+         short_description
+         estimated_factory_lead_days
+         descriptions {
+          credit_string
+          text
+        }
+        total_avail
+        avg_avail
+        best_datasheet{
+          name
+          url
+        }
+        free_sample_url
+        manufacturer_url
+        median_price_1000 {
+          converted_currency
+          converted_price
+        }
+         octopart_url
+         best_image {
+             url
+         }
+        category {
+          name
+        }
          manufacturer {
            name
            id
+
          }
          sellers{
            company{
-             id
-             name
-           }
+              id
+              homepage_url
+              is_verified
+              name
+              slug
+            }
+            is_authorized
+            is_broker
+            is_rfq
            offers{
              id
              click_url
              inventory_level
              sku
              moq
+             packaging
+             updated
             multipack_quantity
             order_multiple
              prices{
                quantity
                price
                converted_price
+               converted_currency
+               conversion_rate
                currency
              }
            }
@@ -94,14 +131,27 @@ def match_mpns(client, mpns):
             reference
             parts {
                 id
+                mpn
+                manufacturer_url
+                short_description
+                estimated_factory_lead_days
+                octopart_url
+                free_sample_url
+                total_avail
+                avg_avail
+                best_datasheet{
+                  name
+                  url
+                }
+                median_price_1000 {
+                  converted_currency
+                  converted_price
+                }
                 manufacturer {
                     id
                     name
                 }
-                mpn
-                manufacturer_url
-                short_description
-                octopart_url
+
                 best_image {
                     url
                 }

@@ -9,6 +9,10 @@ class ResConfigSettings(models.TransientModel):
 
     api_token = fields.Char(string="Octopart API token")
     client_url = fields.Char(string="Octopart Client URL")
+    #TODO: add field for Basic and PRO subscribtion
+    #based on subscription level some values might be available some not
+
+
 
     def set_values(self):
        """Octopart API setting field values"""
