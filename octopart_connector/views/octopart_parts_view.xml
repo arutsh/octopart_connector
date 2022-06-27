@@ -56,7 +56,7 @@
                 <field name="date" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="part_id" attrs="{'readonly': [('id', '!=', False)]}" invisible="1"/>
                 <field name="est_factory_lead_time"/>
-                <field name="median_price_1000_converted_currency" />
+                <field name="median_price_1000_converted_currency" widget="monetary" options="{'currency_field': 'currency_id'}" />
                 <field name="free_sample_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="datasheet_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
               </group>

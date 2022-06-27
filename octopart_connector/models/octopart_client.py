@@ -123,6 +123,87 @@ def search_mpn(client, mpn, currency):
     resp = client.execute(query, var)
     return json.loads(resp)
 
+def search_mpn_basic(client, mpn, currency):
+
+    query = '''
+    query MyPartSearch ($q: String!, $curr: String!, $country: String!){
+    search(q: $q, currency: $curr, country: $country) {
+     hits
+     results {
+       part {
+         id
+         mpn
+         manufacturer_url
+         short_description
+         descriptions {
+          credit_string
+          text
+        }
+        total_avail
+        avg_avail
+
+        free_sample_url
+        manufacturer_url
+        median_price_1000 {
+          converted_currency
+          converted_price
+        }
+         octopart_url
+         best_image {
+             url
+         }
+        category {
+          name
+        }
+         manufacturer {
+           name
+           id
+
+         }
+         sellers{
+           company{
+              id
+              homepage_url
+              is_verified
+              name
+              slug
+            }
+            is_authorized
+            is_broker
+            is_rfq
+           offers{
+             id
+             click_url
+             inventory_level
+             sku
+             moq
+             packaging
+             updated
+            multipack_quantity
+            order_multiple
+             prices{
+               quantity
+               price
+               converted_price
+               converted_currency
+               conversion_rate
+               currency
+             }
+           }
+         }
+       }
+     }
+   }
+}'''
+    var = {
+      "q": mpn,
+      "curr": currency,
+      "country": "GB"
+    }
+    resp = client.execute(query, var)
+    return json.loads(resp)
+
+
 def match_mpns(client, mpns):
     dsl = '''
     query match_mpns($queries: [PartMatchQuery!]!) {
@@ -172,13 +253,59 @@ def match_mpns(client, mpns):
 
     return json.loads(resp)['data']['multi_match']
 
-def demo_match_mpns(client, mpn):
+def match_mpns_basic(client, mpns):
+    dsl = '''
+    query match_mpns($queries: [PartMatchQuery!]!) {
+        multi_match(queries: $queries) {
+            hits
+            reference
+            parts {
+                id
+                mpn
+                manufacturer_url
+                short_description
+                octopart_url
+                free_sample_url
+                total_avail
+                avg_avail
+                median_price_1000 {
+                  converted_currency
+                  converted_price
+                }
+                manufacturer {
+                    id
+                    name
+                }
+
+                best_image {
+                    url
+                }
+            }
+        }
+    }
+    '''
+    #TODO number of parts limits to 1, for enhancemenet this has to be changed
+    queries = []
+    for mpn in mpns:
+        queries.append({
+            'mpn_or_sku': mpn,
+            'start': 0,
+            'limit': 1,
+            'reference': mpn,
+        })
+    resp = client.execute(dsl, {'queries': queries})
+
+    return json.loads(resp)['data']['multi_match']
+
+def demo_match_mpns(client, mpn, subscription='basic'):
 
     mpns = [
         str(mpn),
     ]
-
-    matches = match_mpns(client, mpns)
+    if subscription == 'pro':
+        matches = match_mpns(client, mpns)
+    elif subscription == 'basic':
+        matches = match_mpns_basic(client, mpns)
 
     #for match in matches:
     #    for part in match['parts']:
@@ -186,8 +313,12 @@ def demo_match_mpns(client, mpn):
 
     return matches
 
-def demo_search_mpn(client, mpn, currency):
+def demo_search_mpn(client, mpn, currency, subscription='basic'):
 
-    matches = search_mpn(client, mpn, currency)
+    if subscription == 'pro':
+        matches = search_mpn(client, mpn, currency)
+    elif subscription == 'basic':
+        matches = search_mpn_basic(client, mpn, currency)
+
     #print(matches)
     return matches

@@ -27,11 +27,11 @@ class OctoPartParts(models.Model):
     description = fields.Text()
     octopart_url = fields.Char()
     image = fields.Char()
-    est_factory_lead_time = fields.Integer(string="Lead time", defualt=0)
+    est_factory_lead_time = fields.Integer(string="Lead time", default=0)
     #Returns already converted price for requested currency
-    median_price_1000_converted_currency = fields.Float(string="Median Price", default = 0, hint="Median price for 1000qty")
+    median_price_1000_converted_currency = fields.Monetary(string="Median Price", default = 0, help="Median price for 1000qty")
     free_sample_url = fields.Char(string="Free sample")
-    datasheet_url = fields.Char(string="Datasheet")
+    datasheet_url = fields.Char(string="Datasheet", help="Available only for pro subscribtion")
     #TODO: default set to GBP manually, has to be match with company currency
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=147)
     linked_part_id = fields.Many2one('product.template', 'Link to Product')
@@ -242,11 +242,12 @@ class OctoPartParts(models.Model):
     def _match_parts(self):
         _logger.info("OCTOPART PARTS: ___selecting value")
         token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
-        endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
+        endpoint = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
+        subscription = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.subscription')
         client = OctoPartClient(endpoint,token)
 
         mpn = self.name
-        result = demo_match_mpns(client, str(mpn))
+        result = demo_match_mpns(client, str(mpn), subscription)
         for match in result:
             for part in match['parts']:
                 if (self._is_part_exist(part['id'])):
@@ -297,11 +298,12 @@ class OctoPartParts(models.Model):
             # client.inject_token('10d26abe-cb84-476c-b2b7-a18b60ef3312')
             token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
             endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
-            client = OctoPartClient(endpoint)
+            subscription = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.subscription')
+            client = OctoPartClient(endpoint, token)
             client.inject_token(token)
             mpn = self.name
             curr = self.currency_id.name
-            q = demo_search_mpn(client, mpn, curr)
+            q = demo_search_mpn(client, mpn, curr, subscription)
 
             result = q['data']['search']['results']
             avail_ids = []

@@ -19,6 +19,12 @@ To be able to use Octopart Connector app, you should get API token from Octopart
 Octopart Connector>configuration
 > Octopart Client URL: https://octopart.com/api/v4/endpoint
 
+Update: 27/06/2022
+
+Now you can also choose type of subsription: basic or pro. </br>
+Based on the subscription some values (like estimated lead time, datasheet) might be available.</br>
+for more info please refer octopart website.
+
 
 User Access Level
 =================

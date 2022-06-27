@@ -16,6 +16,8 @@
                           <field name="client_url"/>
                           <label for="api_token" string="Octopart api token"/>
                           <field name="api_token"/>
+                          <label for="subscription" string="Your subscription"/>
+                          <field name="subscription"/>
                         </div>
                     </div>
                 </div>
