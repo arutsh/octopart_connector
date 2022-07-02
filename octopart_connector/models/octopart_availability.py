@@ -4,7 +4,8 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
-from odoo.addons.octopart_connector.models.octopart_client  import OctoPartClient, demo_search_mpn
+from odoo.addons.octopart_connector.models.api_client import ApiClient
+from odoo.addons.octopart_connector.models.octopart_client import demo_search_mpn
 
 #TODO: check if it appeares in the project list
 #TODO: testing something else

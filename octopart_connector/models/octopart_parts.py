@@ -7,7 +7,8 @@ from pathlib import Path
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
-from odoo.addons.octopart_connector.models.octopart_client import OctoPartClient, demo_match_mpns, demo_search_mpn
+from odoo.addons.octopart_connector.models.api_client import ApiClient
+from odoo.addons.octopart_connector.models.octopart_client import demo_match_mpns, demo_search_mpn
 from datetime import date, datetime, time, timedelta
 
 _logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ class OctoPartParts(models.Model):
     description = fields.Text()
     octopart_url = fields.Char()
     image = fields.Char()
-    est_factory_lead_time = fields.Integer(string="Lead time", default=0)
+    est_factory_lead_time = fields.Integer(string="Lead time", default=0, help="Available only for pro subscription")
     #Returns already converted price for requested currency
     median_price_1000_converted_currency = fields.Monetary(string="Median Price", default = 0, help="Median price for 1000qty")
     free_sample_url = fields.Char(string="Free sample")
@@ -244,7 +245,7 @@ class OctoPartParts(models.Model):
         token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
         endpoint = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
         subscription = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.subscription')
-        client = OctoPartClient(endpoint,token)
+        client = ApiClient(endpoint,token)
 
         mpn = self.name
         result = demo_match_mpns(client, str(mpn), subscription)
@@ -294,12 +295,12 @@ class OctoPartParts(models.Model):
         #TODO: this is not the best solution, in case we want to check updates regularly, several times per day
         if(dt <  date.today()):
             _logger.info("OCTOPART PARTS: __adding values")
-            # client = OctoPartClient('https://octopart.com/api/v4/endpoint')
+            # client = ApiClient('https://octopart.com/api/v4/endpoint')
             # client.inject_token('10d26abe-cb84-476c-b2b7-a18b60ef3312')
             token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
             endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
             subscription = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.subscription')
-            client = OctoPartClient(endpoint, token)
+            client = ApiClient(endpoint, token)
             client.inject_token(token)
             mpn = self.name
             curr = self.currency_id.name
