@@ -2,12 +2,22 @@ from six.moves import urllib
 import json
 import os
 
-# copied from: https://github.com/prisma-labs/python-graphql-client/blob/master/graphqlclient/client.py
-class ApiClient:
-    def __init__(self, endpoint, token, headername='token'):
-        self.endpoint = endpoint
+#Parrent class for API clients
+class ApiClient():
+
+    def __init__(self, name, token, endpoint, headername='token'):
+        print(f"I am ApiCLient init {token} ")
+        self.name = name
         self.token = token
+        self.endpoint = endpoint
         self.headername = headername
+
+
+    def match_mpns(self):
+        pass
+
+    def search_mpns(self):
+        pass
 
     def execute(self, query, variables=None):
         return self._send(query, variables)
@@ -21,7 +31,6 @@ class ApiClient:
                 'variables': variables}
         headers = {'Accept': 'application/json',
                    'Content-Type': 'application/json'}
-
 
         if self.token is not None:
             headers[self.headername] = '{}'.format(self.token)

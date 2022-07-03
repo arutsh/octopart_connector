@@ -12,12 +12,16 @@
                     <h2> Octopart API Settings</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="o_setting_left_pane">
+                          <label for="provider" string="Your Provider"/>
+                          <field name="provider"/>
+                          <label for="subscription" string="Your subscription"/>
+                          <field name="subscription"/>
                           <label for="client_url" string="Octopart Client URL"/>
                           <field name="client_url"/>
                           <label for="api_token" string="Octopart api token"/>
                           <field name="api_token"/>
-                          <label for="subscription" string="Your subscription"/>
-                          <field name="subscription"/>
+
+
                         </div>
                     </div>
                 </div>

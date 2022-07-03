@@ -7,7 +7,7 @@ from pathlib import Path
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
-from odoo.addons.octopart_connector.models.api_client import ApiClient
+from odoo.addons.octopart_connector.models.api_client_settings import ApiClientSettings
 from odoo.addons.octopart_connector.models.octopart_client import demo_match_mpns, demo_search_mpn
 from datetime import date, datetime, time, timedelta
 
@@ -238,17 +238,15 @@ class OctoPartParts(models.Model):
             return True
         return False
 
+#get api token from ApiClient object
+    def get_api_client(self):
+        client = ApiClientSettings(self.env['ir.config_parameter'])
+        client = client.getProvider()
 
-    @api.onchange('name')
-    def _match_parts(self):
-        _logger.info("OCTOPART PARTS: ___selecting value")
-        token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
-        endpoint = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
-        subscription = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.subscription')
-        client = ApiClient(endpoint,token)
+        return client
 
-        mpn = self.name
-        result = demo_match_mpns(client, str(mpn), subscription)
+# receive value from API search and updates record
+    def update_record(self, result):
         for match in result:
             for part in match['parts']:
                 if (self._is_part_exist(part['id'])):
@@ -284,6 +282,62 @@ class OctoPartParts(models.Model):
                         self.datasheet_url = '<a href="'+ part['best_datasheet']['url']+'" target="_blank">Datasheet</a>'
 
 
+    @api.onchange('name')
+    def _match_parts(self):
+        _logger.info("OCTOPART PARTS: ___selecting value")
+
+        client = self.get_api_client()
+
+        mpn = self.name
+        result = client.match_mpns(str(mpn))
+        # result = demo_match_mpns(client, str(mpn), client.subscription)
+        self.update_record(result)
+
+    #update availability with given query result
+    def update_availability(self, result):
+
+        avail_ids = []
+        for match in result:
+            part_id = match['part']['id']
+            if part_id != self.part_id:
+                continue
+            name = match['part']['mpn']
+            for sellers in match['part']['sellers']:
+                seller = self.env['octopart.parts.vendors'].create({
+                'vendor_id':sellers['company']['id'],
+                'name':sellers['company']['name']
+                }).id
+                #seller = sellers['company']['name']
+                for offers in sellers['offers']:
+                    stock_level = offers['inventory_level']
+                    stock_avail = 'false'
+                    if stock_level > 0 :
+                        stock_avail='true'
+                    offer_url = '<a href= "' + offers['click_url'] +'" target="_blank">'+sellers['company']['name']+'</a>'
+                    sku = offers['sku']
+                    moq = offers['moq']
+                    for p in offers['prices']:
+                        price = p['converted_price']
+                        currency = p['currency']
+                        batch_qty = p['quantity']
+                        _logger.info("OCTOPART PARTS: #create record for each seller and price groupe")
+
+                        ret = self.env['octopart.parts.availability'].create({
+                            'avail_id': self.id,
+                            'currency_id': self.currency_id.id,
+                            'part_id':part_id,
+                            'name':name,
+                            'seller':seller,
+                            'stock_level': stock_level,
+                            'stock_avail': stock_avail,
+                            'sku': sku,
+                            'moq': moq,
+                            'price': price,
+                            'currency': currency,
+                            'batch_qty': batch_qty,
+                            'offer_url': offer_url
+                        })
+
 
     def check_availability(self):
         #get the latest update of available components
@@ -295,59 +349,13 @@ class OctoPartParts(models.Model):
         #TODO: this is not the best solution, in case we want to check updates regularly, several times per day
         if(dt <  date.today()):
             _logger.info("OCTOPART PARTS: __adding values")
-            # client = ApiClient('https://octopart.com/api/v4/endpoint')
-            # client.inject_token('10d26abe-cb84-476c-b2b7-a18b60ef3312')
-            token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
-            endpoint = value = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
-            subscription = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.subscription')
-            client = ApiClient(endpoint, token)
-            client.inject_token(token)
+
+            settings = self.get_api_client()
             mpn = self.name
             curr = self.currency_id.name
-            q = demo_search_mpn(client, mpn, curr, subscription)
-
+            q = demo_search_mpn(settings['client'], mpn, curr, settings['subscription'])
             result = q['data']['search']['results']
-            avail_ids = []
-            for match in result:
-                part_id = match['part']['id']
-                if part_id != self.part_id:
-                    continue
-                name = match['part']['mpn']
-                for sellers in match['part']['sellers']:
-                    seller = self.env['octopart.parts.vendors'].create({
-                    'vendor_id':sellers['company']['id'],
-                    'name':sellers['company']['name']
-                    }).id
-                    #seller = sellers['company']['name']
-                    for offers in sellers['offers']:
-                        stock_level = offers['inventory_level']
-                        stock_avail = 'false'
-                        if stock_level > 0 :
-                            stock_avail='true'
-                        offer_url = '<a href= "' + offers['click_url'] +'" target="_blank">'+sellers['company']['name']+'</a>'
-                        sku = offers['sku']
-                        moq = offers['moq']
-                        for p in offers['prices']:
-                            price = p['converted_price']
-                            currency = p['currency']
-                            batch_qty = p['quantity']
-                            _logger.info("OCTOPART PARTS: #create record for each seller and price groupe")
-
-                            ret = self.env['octopart.parts.availability'].create({
-                                'avail_id': self.id,
-                                'currency_id': self.currency_id.id,
-                                'part_id':part_id,
-                                'name':name,
-                                'seller':seller,
-                                'stock_level': stock_level,
-                                'stock_avail': stock_avail,
-                                'sku': sku,
-                                'moq': moq,
-                                'price': price,
-                                'currency': currency,
-                                'batch_qty': batch_qty,
-                                'offer_url': offer_url
-                            })
+            self.update_availability(result)
 
 
     def unlink(self):

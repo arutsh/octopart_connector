@@ -10,6 +10,7 @@ class ResConfigSettings(models.TransientModel):
     api_token = fields.Char(string="Octopart API token")
     client_url = fields.Char(string="Octopart Client URL")
     subscription = fields.Selection([('basic', 'Basic'), ('pro', 'Pro')])
+    provider = fields.Selection([('octopart', 'Octopart')])
 
 
     def set_values(self):
@@ -18,6 +19,7 @@ class ResConfigSettings(models.TransientModel):
        self.env['ir.config_parameter'].set_param('octopart_connector.api_token', self.api_token)
        self.env['ir.config_parameter'].set_param('octopart_connector.client_url', self.client_url)
        self.env['ir.config_parameter'].set_param('octopart_connector.subscription', self.subscription)
+       self.env['ir.config_parameter'].set_param('octopart_connector.provider', self.provider)
        return res
 
     def get_values(self):
@@ -26,9 +28,11 @@ class ResConfigSettings(models.TransientModel):
        token = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.api_token')
        client = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.client_url')
        subscription = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.subscription')
+       provider = self.env['ir.config_parameter'].sudo().get_param('octopart_connector.provider')
        res.update(
            api_token=token,
            client_url=client,
-           subscription = subscription
+           subscription = subscription,
+           provider = provider
        )
        return res
