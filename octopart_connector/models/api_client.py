@@ -44,3 +44,22 @@ class ApiClient():
             print((e.read()))
             print('')
             raise e
+    #new API client has to request this and return dict according to defined struct
+    def get_dict_data(self):
+        d = {
+            'part_id':None,
+            'name':None,
+            'manufacturer_url': None,
+            'description': None,
+            'provider': None,
+            'provider_url': None,
+            'image_url': None,
+            'factory_lead_time': None,
+            'median_price': None,
+            'free_sample_url': None,
+            'datasheet_url': None,
+            'manufacturer': None,
+            'category': None,
+            'avg_avai': None
+        }
+        return d

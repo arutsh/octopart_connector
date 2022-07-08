@@ -232,7 +232,8 @@ class OctoPartParts(models.Model):
             else:
                 record.avg_price = None
 
-    def _is_part_exist(self, part_id):
+    def _is_part_exist(self, part_id, provider):
+        ## TODO: add provider name for filtering after provider is created
         if self.search([('part_id', '=' , part_id)]):
             raise UserError("part already exist")
             return True
@@ -245,53 +246,58 @@ class OctoPartParts(models.Model):
 
         return client
 
+    def add_manufacturer(self,manufacturer):
+        return self.env['octopart.parts.manufacturers'].create({
+        'manufacturer_id':manufacturer['id'],
+        'name':manufacturer['name']
+        }).id
+
+    #new module parts category has to be created
+    def add_category(self, category):
+        pass
+
 # receive value from API search and updates record
-    def update_record(self, result):
-        for match in result:
-            for part in match['parts']:
-                if (self._is_part_exist(part['id'])):
-                    self.name = ""
-                else:
-                    self.part_id = part['id']
+    def update_record(self, part):
 
-                    self.manufacturer = self.env['octopart.parts.manufacturers'].create({
-                    'manufacturer_id':part['manufacturer']['id'],
-                    'name':part['manufacturer']['name']
-                    }).id
+        if (self._is_part_exist(part['part_id'], part['provider'])):
+            self.name = ""
+        else:
+            self.part_id = part['part_id']
+            self.manufacturer =  self.add_manufacturer(part['manufacturer'])
 
-                    #self.manufacturer = part['manufacturer']['name']
-                    if part['manufacturer_url'] != None:
-                        self.manufacturer_url = '<a href= "' + part['manufacturer_url']+'" target="_blank"> Manufacturer URL </a>'
-                    self.description = part['short_description']
-                    if part['octopart_url'] != None:
-                        self.octopart_url = '<a href= "' + part['octopart_url'] +'" target="_blank">Octopart URL</a>'
+            #self.manufacturer = part['manufacturer']['name']
+            if part['manufacturer_url']:
+                self.manufacturer_url = '<a href= "' + part['manufacturer_url']+'" target="_blank"> Manufacturer URL </a>'
+            self.description = part['description']
+            if part['provider_url']:
+                self.octopart_url = '<a href= "' + part['provider_url'] +'" target="_blank">Octopart URL</a>'
 
-                    if part['best_image'] != None:
-                        self.image = '<img src = "' + part['best_image']['url'] + '" width="150px">'
+            if part['image_url']:
+                print(f"image_url = {part['image_url']} - {type(part['image_url'])}")
+                self.image = '<img src = "' + part['image_url'] + '" width="150px">'
 
-                    if part['estimated_factory_lead_days'] != None:
-                        self.est_factory_lead_time = int(part['estimated_factory_lead_days']/7)
+            if part['factory_lead_time']:
+                self.est_factory_lead_time = part['factory_lead_time']
 
-                    if part['median_price_1000'] != None:
-                        self.median_price_1000_converted_currency = float(part['median_price_1000']['converted_price'])
+            if part['median_price']:
+                self.median_price_1000_converted_currency = part['median_price']
 
-                    if part['free_sample_url'] != None:
-                        self.free_sample_url = '<a href="'+ part['free_sample_url']+'" target="_blank">Free Sample</a>'
+            if part['free_sample_url']:
+                self.free_sample_url = '<a href="'+ part['free_sample_url']+'" target="_blank">Free Sample</a>'
 
-                    if part['best_datasheet'] != None:
-                        self.datasheet_url = '<a href="'+ part['best_datasheet']['url']+'" target="_blank">Datasheet</a>'
-
+            if part['datasheet_url']:
+                self.datasheet_url = '<a href="'+ part['datasheet_url']+'" target="_blank">Datasheet</a>'
 
     @api.onchange('name')
     def _match_parts(self):
         _logger.info("OCTOPART PARTS: ___selecting value")
+        if(self.name):
+            client = self.get_api_client()
 
-        client = self.get_api_client()
-
-        mpn = self.name
-        result = client.match_mpns(str(mpn))
-        # result = demo_match_mpns(client, str(mpn), client.subscription)
-        self.update_record(result)
+            mpn = self.name
+            result = client.match_mpns(str(mpn))
+            # result = demo_match_mpns(client, str(mpn), client.subscription)
+            self.update_record(result)
 
     #update availability with given query result
     def update_availability(self, result):
