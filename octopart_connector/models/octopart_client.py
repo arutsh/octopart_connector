@@ -19,13 +19,13 @@ class OctopartApiClient(ApiClient):
 
     def match_mpns(self, mpn):
 
-        # if self.subscription == 'pro':
-        #     matches = self._search_mpn_pro(mpn)
-        # elif self.subscription == 'basic':
-        #     matches = self._search_mpn_pro(mpn)
+        if self.subscription == 'pro':
+            matches = self._search_mpn_pro(mpn)
+        elif self.subscription == 'basic':
+            matches = self._search_mpn_pro(mpn)
 
-            ## TODO:  Remove after # DEBUG:
-        matches = STRING
+        # ## TODO:  Remove after # DEBUG:
+        # matches = STRING
         return self.filter_matches(matches, mpn)
 
     def filter_matches(self, matches, mpn):

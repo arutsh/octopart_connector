@@ -20,7 +20,8 @@ class OctoPartParts(models.Model):
     _order = "id desc"
 
     avail_ids = fields.One2many("octopart.parts.availability", "avail_id")
-    part_id = fields.Char(string="PartsBox ID", required=True)
+    part_id = fields.Char(string="Provider's part ID", required=True)
+    provider = fields.Char(string="Provider", help="part information was retrie from this provider")
     name = fields.Char(required=True)
     date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)
     manufacturer = fields.Many2one('octopart.parts.manufacturers',required=True)
@@ -234,8 +235,9 @@ class OctoPartParts(models.Model):
 
     def _is_part_exist(self, part_id, provider):
         ## TODO: add provider name for filtering after provider is created
-        if self.search([('part_id', '=' , part_id)]):
-            raise UserError("part already exist")
+        part = self.search([('part_id', '=' , part_id), ('provider', '=', provider) ])
+        if part:
+            raise UserError(f"{part.name} from {provider}  already exist!")
             return True
         return False
 
@@ -264,8 +266,7 @@ class OctoPartParts(models.Model):
         else:
             self.part_id = part['part_id']
             self.manufacturer =  self.add_manufacturer(part['manufacturer'])
-
-            #self.manufacturer = part['manufacturer']['name']
+            self.provider = part['provider']
             if part['manufacturer_url']:
                 self.manufacturer_url = '<a href= "' + part['manufacturer_url']+'" target="_blank"> Manufacturer URL </a>'
             self.description = part['description']
