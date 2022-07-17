@@ -37,6 +37,12 @@ class OctoPartParts(models.Model):
     #TODO: default set to GBP manually, has to be match with company currency
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=147)
     linked_part_id = fields.Many2one('product.template', 'Link to Product')
+
+    avg_avail = fields.Integer(string="Total Available", help="Avarage avail of the part", default=None)
+    total_avail = fields.Integer(string="Avg Available", help="Total Availability in the market", default=None)
+
+
+    #All fields below has to be reviewed and optimised
     min_price = fields.Monetary(currency_field='currency_id', compute="_compute_min_price", readonly=True)
     max_price = fields.Monetary(currency_field='currency_id', compute="_compute_max_price", readonly=True)
     avg_price = fields.Monetary(currency_field='currency_id', compute="_compute_avg_price", readonly=True)
@@ -355,12 +361,10 @@ class OctoPartParts(models.Model):
         #if latest update is smaller then today then refresh data, otherwise do nothing
         #TODO: this is not the best solution, in case we want to check updates regularly, several times per day
         if(dt <  date.today()):
-            _logger.info("OCTOPART PARTS: __adding values")
+            _logger.info("API: __adding values")
 
-            settings = self.get_api_client()
-            mpn = self.name
-            curr = self.currency_id.name
-            q = demo_search_mpn(settings['client'], mpn, curr, settings['subscription'])
+            client = self.get_api_client()
+            q = client.search_mpn_availability(self.name, self.part_id, self.currency_id.name)
             result = q['data']['search']['results']
             self.update_availability(result)
 
