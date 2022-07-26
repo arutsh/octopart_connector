@@ -1,6 +1,6 @@
 {
     "name": "Octopart Connector",
-    "version": "1.5",
+    "version": "1.6",
     "summary":
     '''Module links products with octopart component name and check stock availability
     v1.5: changing module structure to general one, so in the future any octopart
