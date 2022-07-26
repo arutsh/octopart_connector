@@ -20,7 +20,8 @@ class OctoPartParts(models.Model):
     _order = "id desc"
 
     avail_ids = fields.One2many("octopart.parts.availability", "avail_id")
-    part_id = fields.Char(string="PartsBox ID", required=True)
+    part_id = fields.Char(string="Provider's part ID", required=True)
+    provider = fields.Char(string="Provider", help="part information was retrie from this provider")
     name = fields.Char(required=True)
     date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)
     manufacturer = fields.Many2one('octopart.parts.manufacturers',required=True)
@@ -36,6 +37,12 @@ class OctoPartParts(models.Model):
     #TODO: default set to GBP manually, has to be match with company currency
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=147)
     linked_part_id = fields.Many2one('product.template', 'Link to Product')
+
+    avg_avail = fields.Integer(string="Total Available", help="Avarage avail of the part", default=None)
+    total_avail = fields.Integer(string="Avg Available", help="Total Availability in the market", default=None)
+
+
+    #All fields below has to be reviewed and optimised
     min_price = fields.Monetary(currency_field='currency_id', compute="_compute_min_price", readonly=True)
     max_price = fields.Monetary(currency_field='currency_id', compute="_compute_max_price", readonly=True)
     avg_price = fields.Monetary(currency_field='currency_id', compute="_compute_avg_price", readonly=True)
@@ -234,8 +241,9 @@ class OctoPartParts(models.Model):
 
     def _is_part_exist(self, part_id, provider):
         ## TODO: add provider name for filtering after provider is created
-        if self.search([('part_id', '=' , part_id)]):
-            raise UserError("part already exist")
+        part = self.search([('part_id', '=' , part_id), ('provider', '=', provider) ])
+        if part:
+            raise UserError(f"{part.name} from {provider}  already exist!")
             return True
         return False
 
@@ -264,8 +272,7 @@ class OctoPartParts(models.Model):
         else:
             self.part_id = part['part_id']
             self.manufacturer =  self.add_manufacturer(part['manufacturer'])
-
-            #self.manufacturer = part['manufacturer']['name']
+            self.provider = part['provider']
             if part['manufacturer_url']:
                 self.manufacturer_url = '<a href= "' + part['manufacturer_url']+'" target="_blank"> Manufacturer URL </a>'
             self.description = part['description']
@@ -303,46 +310,42 @@ class OctoPartParts(models.Model):
     def update_availability(self, result):
 
         avail_ids = []
-        for match in result:
-            part_id = match['part']['id']
-            if part_id != self.part_id:
-                continue
-            name = match['part']['mpn']
-            for sellers in match['part']['sellers']:
-                seller = self.env['octopart.parts.vendors'].create({
-                'vendor_id':sellers['company']['id'],
-                'name':sellers['company']['name']
-                }).id
-                #seller = sellers['company']['name']
-                for offers in sellers['offers']:
-                    stock_level = offers['inventory_level']
-                    stock_avail = 'false'
-                    if stock_level > 0 :
-                        stock_avail='true'
-                    offer_url = '<a href= "' + offers['click_url'] +'" target="_blank">'+sellers['company']['name']+'</a>'
-                    sku = offers['sku']
-                    moq = offers['moq']
-                    for p in offers['prices']:
-                        price = p['converted_price']
-                        currency = p['currency']
-                        batch_qty = p['quantity']
-                        _logger.info("OCTOPART PARTS: #create record for each seller and price groupe")
+        part_id = result['part_id']
+        name = result['mpn']
+        for s in result['sellers']:
+            seller = self.env['octopart.parts.vendors'].create({
+            'vendor_id':s['id'],
+            'name':s['name']
+            }).id
+            for offer in s['offers']:
+                stock_level = offer['stock_level']
+                stock_avail = 'false'
+                if stock_level > 0 :
+                    stock_avail='true'
+                offer_url = '<a href= "' + offer['offer_url'] +'" target="_blank">'+s['name']+'</a>'
+                sku = offer['sku']
+                moq = offer['moq']
+                for p in offer['prices']:
+                    price = p['converted_price']
+                    currency = p['converted_currency']
+                    batch_qty = p['quantity']
+                    _logger.info("OCTOPART PARTS: #create record for each seller and price group")
 
-                        ret = self.env['octopart.parts.availability'].create({
-                            'avail_id': self.id,
-                            'currency_id': self.currency_id.id,
-                            'part_id':part_id,
-                            'name':name,
-                            'seller':seller,
-                            'stock_level': stock_level,
-                            'stock_avail': stock_avail,
-                            'sku': sku,
-                            'moq': moq,
-                            'price': price,
-                            'currency': currency,
-                            'batch_qty': batch_qty,
-                            'offer_url': offer_url
-                        })
+                    ret = self.env['octopart.parts.availability'].create({
+                        'avail_id': self.id,
+                        'currency_id': self.currency_id.id,
+                        'part_id':part_id,
+                        'name':name,
+                        'seller':seller,
+                        'stock_level': stock_level,
+                        'stock_avail': stock_avail,
+                        'sku': sku,
+                        'moq': moq,
+                        'price': price,
+                        'currency': currency,
+                        'batch_qty': batch_qty,
+                        'offer_url': offer_url
+                    })
 
 
     def check_availability(self):
@@ -354,14 +357,11 @@ class OctoPartParts(models.Model):
         #if latest update is smaller then today then refresh data, otherwise do nothing
         #TODO: this is not the best solution, in case we want to check updates regularly, several times per day
         if(dt <  date.today()):
-            _logger.info("OCTOPART PARTS: __adding values")
+            _logger.info("API: __adding values")
 
-            settings = self.get_api_client()
-            mpn = self.name
-            curr = self.currency_id.name
-            q = demo_search_mpn(settings['client'], mpn, curr, settings['subscription'])
-            result = q['data']['search']['results']
-            self.update_availability(result)
+            client = self.get_api_client()
+            q = client.search_mpn_availability(self.name, self.part_id, self.currency_id.name)
+            self.update_availability(q)
 
 
     def unlink(self):

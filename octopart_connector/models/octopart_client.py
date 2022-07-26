@@ -19,17 +19,87 @@ class OctopartApiClient(ApiClient):
 
     def match_mpns(self, mpn):
 
-        # if self.subscription == 'pro':
-        #     matches = self._search_mpn_pro(mpn)
-        # elif self.subscription == 'basic':
-        #     matches = self._search_mpn_pro(mpn)
+        if self.subscription == 'pro':
+            matches = self._search_mpn_pro(mpn)
+        elif self.subscription == 'basic':
+            matches = self._search_mpn_basic(mpn)
 
-            ## TODO:  Remove after # DEBUG:
-        matches = STRING
-        return self.filter_matches(matches, mpn)
+        # ## TODO:  Remove after # DEBUG:
+        # matches = STRING
+        return self.filter_part_matches(matches, mpn)
 
-    def filter_matches(self, matches, mpn):
-        d = self.get_dict_data()
+    def search_mpn_availability(self, mpn, pid, currency='GBP'):
+
+        matches = self._search_mpn_availability(mpn)
+
+        #matches = [{'part': {'id': '88318820', 'mpn': 'LTC3026EMSE#PBF', 'sellers': [{'company': {'id': '12899', 'homepage_url': 'https://extremecomponents.com', 'is_verified': False, 'name': 'Extreme Components', 'slug': 'extreme-components'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '663797666', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=29167&sig=0e5a5b7&vpid=663797666', 'inventory_level': 135, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-04-23T07:52:45Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '12079', 'homepage_url': 'http://www.sourceability.com', 'is_verified': False, 'name': 'Sourceability', 'slug': 'sourceability'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '662606679', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=28281&sig=0a37f74&vpid=662606679', 'inventory_level': 43, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-06-29T15:13:15Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10079', 'homepage_url': 'http://www.abacuselect.com/', 'is_verified': False, 'name': 'Abacus Technologies', 'slug': 'abacus-technologies'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '462282693', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=25917&sig=0a9b3d3&vpid=462282693', 'inventory_level': 0, 'sku': 'LTC3026EMSEPBF', 'moq': None, 'packaging': None, 'updated': '2022-07-16T00:02:43Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10643', 'homepage_url': 'http://iodparts.com', 'is_verified': False, 'name': 'iodParts', 'slug': 'iodparts'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '671948368', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=26822&sig=065aa5d&vpid=671948368', 'inventory_level': 78, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-07-15T11:22:57Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}]}}]
+
+        return self.filter_availability_matches(matches, mpn, pid)
+
+    def filter_availability_matches(self, matches, mpn, pid):
+        d =  self.get_availability_data()
+        #print(f"mpn = {mpn}, id = {pid}")
+        # print(f"matches = {matches}")
+        for match in matches:
+            if (match['part']['mpn']).lower() == mpn.lower() and match['part']['id'] ==  pid:
+                s_d  = self.get_seller_data()
+                d['part_id'] =  pid
+                d['mpn'] = mpn
+                d['seller'] = []
+                sellers = match['part']['sellers']
+                #print(f"sellers ")
+                for s in sellers:
+                    #print(f"s = {s}")
+                    s_d['id'] = s['company']['id']
+                    s_d['name'] = s['company']['name']
+                    s_d['is_verified'] = s['company']['name']
+                    s_d['homepage_url'] = s['company']['homepage_url']
+                    s_d['is_authorized'] = s['is_authorized']
+                    s_d['is_broker'] = s['is_broker']
+                    s_d['is_rfq'] = s['is_rfq']
+                    s_d['offers'] = []
+
+                    offers = s['offers']
+                    o_d = self.get_offers_data()
+                    for offer in  offers:
+                        o_d['id'] =  offer['id']
+                        o_d['stock_level'] =  offer['inventory_level']
+                        o_d['offer_url'] =  offer['click_url']
+                        o_d['sku'] =  offer['sku']
+                        o_d['moq'] =  offer['moq']
+                        o_d['packaging'] = offer['packaging']
+                        o_d['updated'] = offer['updated']
+                        o_d['multipack_quantity'] = offer['multipack_quantity']
+                        o_d['order_multiple'] = offer['order_multiple']
+                        o_d['prices'] = []
+                        prices = offer['prices']
+                        p_d = self.get_prices_data()
+
+                        for p in prices:
+                            p_d['quantity'] = p['quantity']
+                            p_d['price'] = p['price']
+                            p_d['converted_price'] = p['converted_price']
+                            p_d['converted_currency'] = p['converted_currency']
+                            p_d['conversion_rate'] = p['conversion_rate']
+                            p_d['currency'] = p['currency']
+                            #print(f"p_d = {p_d}")
+                            o_d['prices'].append(dict(p_d))
+                        s_d['offers'].append(dict(o_d))
+                    # print(f"s_d = {s_d}")
+                    d['sellers'].append(dict(s_d))
+            print(f"d = {d}")
+
+        return d
+
+
+
+
+
+
+
+
+    def filter_part_matches(self, matches, mpn):
+        d = self.get_part_data()
 
         for match in matches:
             if (match['part']['mpn']).lower() == mpn.lower():
@@ -52,8 +122,9 @@ class OctopartApiClient(ApiClient):
                     d['category'] = match['part']['category']
                 if match['part']['manufacturer']:
                     d['manufacturer'] = match['part']['manufacturer']
-
-                return(d)
+                d['avg_avail'] = match['part']['avg_avail']
+                d['total_avail'] = match['part']['total_avail']
+        return(d)
 
 
     def _search_mpn_pro(self, mpn, currency='GBP'):
@@ -115,8 +186,6 @@ class OctopartApiClient(ApiClient):
 
         return ret['data']['search_mpn']['results']
 
-
-
     def _search_mpns_basic(self, mpns):
         dsl = '''
         query match_mpns($queries: [PartMatchQuery!]!) {
@@ -148,18 +217,74 @@ class OctopartApiClient(ApiClient):
             }
         }
         '''
-        #TODO number of parts limits to 1, for enhancemenet this has to be changed
-        queries = []
-        for mpn in mpns:
-            queries.append({
-                'mpn_or_sku': mpn,
-                'start': 0,
-                'limit': 1,
-                'reference': mpn,
-            })
-        resp = self.execute(dsl, {'queries': queries})
+        var = {
+          "q": mpn,
+          "curr": currency,
+          "country": "GB",
+          "limit":1,
 
-        return json.loads(resp)['data']['multi_match']
+        }
+        resp = self.execute(query, var)
+        ret = json.loads(resp)
+
+        return ret['data']['search_mpn']['results']
+
+    def _search_mpn_availability(self, mpn, currency='GBP'):
+        print(f"_search_mpn_availability mpn = {mpn}")
+        query = '''
+        query Match_part($q: String, $curr: String!, $country: String!){
+        search_mpn(q: $q, currency: $curr, country: $country) {
+            hits
+            results {
+                part {
+                    id
+                    mpn
+                    sellers{
+                        company{
+                            id
+                            homepage_url
+                            is_verified
+                            name
+                            slug
+                        }
+                        is_authorized
+                        is_broker
+                        is_rfq
+                        offers{
+                            id
+                            click_url
+                            inventory_level
+                            sku
+                            moq
+                            packaging
+                            updated
+                            multipack_quantity
+                            order_multiple
+                            prices{
+                                quantity
+                                price
+                                converted_price
+                                converted_currency
+                                conversion_rate
+                                currency
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        }
+        '''
+
+        var = {
+          "q": mpn,
+          "curr": currency,
+          "country": "GB",
+        }
+        resp = self.execute(query, var)
+        ret = json.loads(resp)
+
+        return ret['data']['search_mpn']['results']
 
 
     def _search_pro(self, mpn, currency="GBP"):

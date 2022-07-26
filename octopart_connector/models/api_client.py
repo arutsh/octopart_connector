@@ -44,8 +44,8 @@ class ApiClient():
             print((e.read()))
             print('')
             raise e
-    #new API client has to request this and return dict according to defined struct
-    def get_dict_data(self):
+    #new API client has to request this  for each part and return dict according to defined struct
+    def get_part_data(self):
         d = {
             'part_id':None,
             'name':None,
@@ -60,6 +60,55 @@ class ApiClient():
             'datasheet_url': None,
             'manufacturer': None,
             'category': None,
+            'total_avail': None,
             'avg_avai': None
+        }
+        return d
+
+    def get_availability_data(self):
+        d = {
+            'part_id':None,
+            'mpn': None,
+            'sellers':[], # sellers is list of sellers defined in get_seller_data()
+        }
+        return d
+
+    def get_seller_data(self):
+        d = {
+            'id': None,
+            'name' : None, #SELLER name
+            'is_verified':None,
+            'is_authorized':None, #boolean
+            'is_broker':None, #Boolean
+            'is_rfq':None, #Boolean
+            'homepage_url' : None,
+            'offers': [], # offers is list of offers from each seller, defined get_offers_data
+            }
+
+        return d
+
+    def get_offers_data(self):
+        d={
+            'id' : None,
+            'stock_level' : None,
+            'offer_url' : None,
+            'sku' : None,
+            'moq' : None,
+            'packaging' : None,
+            'updated' : None,
+            'multipack_quantity': None,
+            'order_multiple' : None,
+            'prices' : [], # is list of prices defined get_prices_data
+        }
+
+        return d
+    def get_prices_data(self):
+        d = {
+               'quantity' : None,
+               'price' : None,
+               'converted_price' : None,
+               'converted_currency' : None,
+               'conversion_rate': None,
+               'currency': None
         }
         return d

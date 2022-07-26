@@ -15,7 +15,7 @@ class OctoPartAvailability(models.Model):
     _order = "id desc"
 
     avail_id = fields.Many2one("octopart.parts", string="Part name")
-    part_id = fields.Integer(readonly=True)
+    part_id = fields.Char(readonly=True)
     name = fields.Char(required=True, readonly=True)
     date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)
     seller = fields.Many2one('octopart.parts.vendors',required=True)

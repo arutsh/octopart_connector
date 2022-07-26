@@ -11,7 +11,7 @@ from odoo.addons.octopart_connector.models.octopart_client import demo_match_mpn
 
 class OctoPartManufacturers(models.Model):
     _name = "octopart.parts.manufacturers"
-    _description = "Retrieves manufacturers from octopart "
+    _description = "Retrieves Manufacturer detail from API provider "
     _order = "id desc"
 
     manufacturer_id = fields.Char(string="PartsBox ID", required=True)
@@ -20,7 +20,6 @@ class OctoPartManufacturers(models.Model):
     def _is_manufacurer_exist(self, m_id):
         if self.search([('manufacturer_id', '=' , m_id)]):
             #raise UserError("Manufacturer already exist")
-            print(self.search([('manufacturer_id', '=' , m_id)]))
             return True
         return False
 

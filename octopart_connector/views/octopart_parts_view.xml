@@ -15,6 +15,7 @@
       <tree string="Octppart parts tree">
         <field name="name"/>
         <field name="description"/>
+        <field name="provider"/>
         <field name="date"/>
         <field name="manufacturer"/>
         <field name="manufacturer_url" widget="html"/>
@@ -30,6 +31,7 @@
       <search string="Parts Search">
         <field name="name"/>
         <field name="description"/>
+        <field name="provider"/>
         <field name="date"/>
         <field name="manufacturer"/>
         <group expand="1" string="Group By">
@@ -51,11 +53,14 @@
                 <field name="linked_part_id" invisible='1' />
                 <field name="currency_id" invisible='1'/>
                 <field name="manufacturer" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="provider" />
                 <field name="manufacturer_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="octopart_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="date" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="part_id" attrs="{'readonly': [('id', '!=', False)]}" invisible="1"/>
                 <field name="est_factory_lead_time"/>
+                <field name="avg_avail"/>
+                <field name="total_avail"/>
                 <field name="median_price_1000_converted_currency" widget="monetary" options="{'currency_field': 'currency_id'}" />
                 <field name="free_sample_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="datasheet_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
