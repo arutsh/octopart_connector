@@ -69,7 +69,7 @@ class ApiClient():
         d = {
             'part_id':None,
             'mpn': None,
-            'seller':[], # seller is list of sellers defined in get_seller_data()
+            'sellers':[], # sellers is list of sellers defined in get_seller_data()
         }
         return d
 

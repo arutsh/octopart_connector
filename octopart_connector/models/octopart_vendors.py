@@ -24,6 +24,7 @@ class OctoPartVendors(models.Model):
     contact_id = fields.Many2one('res.partner', string="Contact")
     description = fields.Text()
 
+
     _sql_constraints = [
         ('check_vendor_id', 'unique(vendor_id)',
          'vendor id has to be unique.')

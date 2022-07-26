@@ -30,26 +30,26 @@ class OctopartApiClient(ApiClient):
 
     def search_mpn_availability(self, mpn, pid, currency='GBP'):
 
-        #matches = self._search_mpn_availability(mpn)
+        matches = self._search_mpn_availability(mpn)
 
-        matches = [{'part': {'id': '88318820', 'mpn': 'LTC3026EMSE#PBF', 'sellers': [{'company': {'id': '12899', 'homepage_url': 'https://extremecomponents.com', 'is_verified': False, 'name': 'Extreme Components', 'slug': 'extreme-components'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '663797666', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=29167&sig=0e5a5b7&vpid=663797666', 'inventory_level': 135, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-04-23T07:52:45Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '12079', 'homepage_url': 'http://www.sourceability.com', 'is_verified': False, 'name': 'Sourceability', 'slug': 'sourceability'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '662606679', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=28281&sig=0a37f74&vpid=662606679', 'inventory_level': 43, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-06-29T15:13:15Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10079', 'homepage_url': 'http://www.abacuselect.com/', 'is_verified': False, 'name': 'Abacus Technologies', 'slug': 'abacus-technologies'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '462282693', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=25917&sig=0a9b3d3&vpid=462282693', 'inventory_level': 0, 'sku': 'LTC3026EMSEPBF', 'moq': None, 'packaging': None, 'updated': '2022-07-16T00:02:43Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10643', 'homepage_url': 'http://iodparts.com', 'is_verified': False, 'name': 'iodParts', 'slug': 'iodparts'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '671948368', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=26822&sig=065aa5d&vpid=671948368', 'inventory_level': 78, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-07-15T11:22:57Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}]}}]
+        #matches = [{'part': {'id': '88318820', 'mpn': 'LTC3026EMSE#PBF', 'sellers': [{'company': {'id': '12899', 'homepage_url': 'https://extremecomponents.com', 'is_verified': False, 'name': 'Extreme Components', 'slug': 'extreme-components'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '663797666', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=29167&sig=0e5a5b7&vpid=663797666', 'inventory_level': 135, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-04-23T07:52:45Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '12079', 'homepage_url': 'http://www.sourceability.com', 'is_verified': False, 'name': 'Sourceability', 'slug': 'sourceability'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '662606679', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=28281&sig=0a37f74&vpid=662606679', 'inventory_level': 43, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-06-29T15:13:15Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10079', 'homepage_url': 'http://www.abacuselect.com/', 'is_verified': False, 'name': 'Abacus Technologies', 'slug': 'abacus-technologies'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '462282693', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=25917&sig=0a9b3d3&vpid=462282693', 'inventory_level': 0, 'sku': 'LTC3026EMSEPBF', 'moq': None, 'packaging': None, 'updated': '2022-07-16T00:02:43Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10643', 'homepage_url': 'http://iodparts.com', 'is_verified': False, 'name': 'iodParts', 'slug': 'iodparts'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '671948368', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=26822&sig=065aa5d&vpid=671948368', 'inventory_level': 78, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-07-15T11:22:57Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}]}}]
 
         return self.filter_availability_matches(matches, mpn, pid)
 
     def filter_availability_matches(self, matches, mpn, pid):
         d =  self.get_availability_data()
-        print(f"mpn = {mpn}, id = {pid}")
+        #print(f"mpn = {mpn}, id = {pid}")
         # print(f"matches = {matches}")
         for match in matches:
             if (match['part']['mpn']).lower() == mpn.lower() and match['part']['id'] ==  pid:
                 s_d  = self.get_seller_data()
                 d['part_id'] =  pid
-                d['name'] = mpn
+                d['mpn'] = mpn
                 d['seller'] = []
                 sellers = match['part']['sellers']
-                print(f"sellers ")
+                #print(f"sellers ")
                 for s in sellers:
-                    print(f"s = {s}")
+                    #print(f"s = {s}")
                     s_d['id'] = s['company']['id']
                     s_d['name'] = s['company']['name']
                     s_d['is_verified'] = s['company']['name']
@@ -86,7 +86,7 @@ class OctopartApiClient(ApiClient):
                             o_d['prices'].append(dict(p_d))
                         s_d['offers'].append(dict(o_d))
                     # print(f"s_d = {s_d}")
-                    d['seller'].append(dict(s_d))
+                    d['sellers'].append(dict(s_d))
             print(f"d = {d}")
 
         return d

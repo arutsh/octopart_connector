@@ -310,46 +310,42 @@ class OctoPartParts(models.Model):
     def update_availability(self, result):
 
         avail_ids = []
-        for match in result:
-            part_id = match['part']['id']
-            if part_id != self.part_id:
-                continue
-            name = match['part']['mpn']
-            for sellers in match['part']['sellers']:
-                seller = self.env['octopart.parts.vendors'].create({
-                'vendor_id':sellers['company']['id'],
-                'name':sellers['company']['name']
-                }).id
-                #seller = sellers['company']['name']
-                for offers in sellers['offers']:
-                    stock_level = offers['inventory_level']
-                    stock_avail = 'false'
-                    if stock_level > 0 :
-                        stock_avail='true'
-                    offer_url = '<a href= "' + offers['click_url'] +'" target="_blank">'+sellers['company']['name']+'</a>'
-                    sku = offers['sku']
-                    moq = offers['moq']
-                    for p in offers['prices']:
-                        price = p['converted_price']
-                        currency = p['currency']
-                        batch_qty = p['quantity']
-                        _logger.info("OCTOPART PARTS: #create record for each seller and price groupe")
+        part_id = result['part_id']
+        name = result['mpn']
+        for s in result['sellers']:
+            seller = self.env['octopart.parts.vendors'].create({
+            'vendor_id':s['id'],
+            'name':s['name']
+            }).id
+            for offer in s['offers']:
+                stock_level = offer['stock_level']
+                stock_avail = 'false'
+                if stock_level > 0 :
+                    stock_avail='true'
+                offer_url = '<a href= "' + offer['offer_url'] +'" target="_blank">'+s['name']+'</a>'
+                sku = offer['sku']
+                moq = offer['moq']
+                for p in offer['prices']:
+                    price = p['converted_price']
+                    currency = p['converted_currency']
+                    batch_qty = p['quantity']
+                    _logger.info("OCTOPART PARTS: #create record for each seller and price group")
 
-                        ret = self.env['octopart.parts.availability'].create({
-                            'avail_id': self.id,
-                            'currency_id': self.currency_id.id,
-                            'part_id':part_id,
-                            'name':name,
-                            'seller':seller,
-                            'stock_level': stock_level,
-                            'stock_avail': stock_avail,
-                            'sku': sku,
-                            'moq': moq,
-                            'price': price,
-                            'currency': currency,
-                            'batch_qty': batch_qty,
-                            'offer_url': offer_url
-                        })
+                    ret = self.env['octopart.parts.availability'].create({
+                        'avail_id': self.id,
+                        'currency_id': self.currency_id.id,
+                        'part_id':part_id,
+                        'name':name,
+                        'seller':seller,
+                        'stock_level': stock_level,
+                        'stock_avail': stock_avail,
+                        'sku': sku,
+                        'moq': moq,
+                        'price': price,
+                        'currency': currency,
+                        'batch_qty': batch_qty,
+                        'offer_url': offer_url
+                    })
 
 
     def check_availability(self):
@@ -365,8 +361,7 @@ class OctoPartParts(models.Model):
 
             client = self.get_api_client()
             q = client.search_mpn_availability(self.name, self.part_id, self.currency_id.name)
-            result = q['data']['search']['results']
-            self.update_availability(result)
+            self.update_availability(q)
 
 
     def unlink(self):
