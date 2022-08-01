@@ -13,10 +13,10 @@ class ApiClient():
         self.headername = headername
 
 
-    def match_mpns(self):
+    def match_mpns(self, mpn, currency='GBP'):
         pass
 
-    def search_mpns(self):
+    def search_mpns(self, mpn, currency='GBP'):
         pass
 
     def execute(self, query, variables=None):
@@ -46,69 +46,77 @@ class ApiClient():
             raise e
     #new API client has to request this  for each part and return dict according to defined struct
     def get_part_data(self):
-        d = {
-            'part_id':None,
-            'name':None,
-            'manufacturer_url': None,
-            'description': None,
-            'provider': None,
-            'provider_url': None,
-            'image_url': None,
-            'factory_lead_time': None,
-            'median_price': None,
-            'free_sample_url': None,
-            'datasheet_url': None,
-            'manufacturer': None,
-            'category': None,
-            'total_avail': None,
-            'avg_avai': None
-        }
-        return d
+        return PartData()
 
     def get_availability_data(self):
-        d = {
-            'part_id':None,
-            'mpn': None,
-            'sellers':[], # sellers is list of sellers defined in get_seller_data()
-        }
-        return d
+        return PartAvailabilityData()
+
+    def get_contact_data(self, manufacturer=False):
+        return ContactData(manufacturer)
 
     def get_seller_data(self):
-        d = {
-            'id': None,
-            'name' : None, #SELLER name
-            'is_verified':None,
-            'is_authorized':None, #boolean
-            'is_broker':None, #Boolean
-            'is_rfq':None, #Boolean
-            'homepage_url' : None,
-            'offers': [], # offers is list of offers from each seller, defined get_offers_data
-            }
-
-        return d
+        return get_contact_data()
 
     def get_offers_data(self):
-        d={
-            'id' : None,
-            'stock_level' : None,
-            'offer_url' : None,
-            'sku' : None,
-            'moq' : None,
-            'packaging' : None,
-            'updated' : None,
-            'multipack_quantity': None,
-            'order_multiple' : None,
-            'prices' : [], # is list of prices defined get_prices_data
-        }
-
-        return d
+        return OfferData
     def get_prices_data(self):
-        d = {
-               'quantity' : None,
-               'price' : None,
-               'converted_price' : None,
-               'converted_currency' : None,
-               'conversion_rate': None,
-               'currency': None
-        }
-        return d
+        return PriceData
+
+
+class PartData():
+    def __init__(self):
+        self.part_id = None
+        self.name = None
+        self.manufacturer_url = None
+        self.description = None
+        self.provider =  None
+        self.provider_url = None
+        self.image_url = None
+        self.factory_lead_time = None
+        self.median_price = None
+        self.free_sample_url = None
+        self.datasheet_url = None
+        self.manufacturer = ContactData(True) #definees ContactData with manufacturer = true
+        self.category = None
+        self.total_avail =  None
+        self.avg_avail = None
+
+class OctoPartAvailabilityData():
+    def __init__(self):
+        self.part_id = None
+        self.mpn =  None
+        self.sellers = [], # sellers is list of sellers defined by ContactData class
+
+class ContactData():
+    def  __init__(self, manufacturer=False):
+
+        self.id =  None #id provided by provider
+        self.name = None #contact name
+        self.is_verified = None
+        self.is_authorized = None #boolean
+        self.is_broker = None #Boolean
+        self.homepage_url = None
+        if not manufacturer:
+            self.offers = [] # offers is list of offers from each seller, defined OfferData class
+
+class OfferData():
+    def __init__(self):
+        self.id = None
+        self.stock_level = None
+        self.offer_url = None
+        self.sku = None
+        self.moq = None
+        self.packaging = None
+        self.updated = None
+        self.multipack_quantity = None
+        self.order_multiple = None
+        self.prices = []  # is list of prices defined by PriceData classs
+
+class PriceData():
+    def __init__(self):
+       self.quantity = None
+       self.price = None
+       self.converted_price = None
+       self.converted_currency = None
+       self.conversion_rate = None
+       self.currency = None

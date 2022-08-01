@@ -14,8 +14,8 @@
       <tree string="Octopart parts Availability">
         <field name="date"/>
         <field name="name"/>
-        <field name="seller"/>
-        <field name="seller_category_ids"/>
+        <field name="seller_id" string="Vendor"/>
+        <field name="seller_category_ids" string="Category" widget="many2many_tags"/>
         <field name="moq"/>
         <field name="stock_level"/>
         <field name="price" widget="monetary"/>
@@ -51,13 +51,14 @@
             <field name="currency_id" />
             <field name="date"/>
             <field name="name"/>
-            <field name="seller"/>
+            <field name="seller_id" string="Vendor"/>
             <field name="sku"/>
             <field name="moq"/>
             <field name="stock_level"/>
             <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
             <field name="batch_qty"/>
             <field name="offer_url" widget="html"/>
+            <field name="seller_category_ids" string="Category" widget="many2many_tags"/>
           </group>
         </sheet>
       </form>

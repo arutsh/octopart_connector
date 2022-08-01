@@ -12,12 +12,13 @@
     <field name="model">octopart.parts</field>
     <field name="groups_id" eval="[(4, ref('stock.group_stock_manager'))]"/>
     <field name="arch" type="xml">
-      <tree string="Octppart parts tree">
+      <tree string="Components tree" >
         <field name="name"/>
         <field name="description"/>
         <field name="provider"/>
         <field name="date"/>
         <field name="manufacturer"/>
+        <field name="currency_id"/>
         <field name="manufacturer_url" widget="html"/>
 
       </tree>
@@ -54,16 +55,16 @@
                 <field name="currency_id" invisible='1'/>
                 <field name="manufacturer" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="provider" />
-                <field name="manufacturer_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
-                <field name="octopart_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="manufacturer_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="octopart_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="date" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="part_id" attrs="{'readonly': [('id', '!=', False)]}" invisible="1"/>
                 <field name="est_factory_lead_time"/>
                 <field name="avg_avail"/>
                 <field name="total_avail"/>
                 <field name="median_price_1000_converted_currency" widget="monetary" options="{'currency_field': 'currency_id'}" />
-                <field name="free_sample_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
-                <field name="datasheet_url" widget="html" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="free_sample_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <field name="datasheet_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
               </group>
               <group>
                 <h1><field name="image" widget="html"  attrs="{'readonly': [('id', '!=', False)]}"/></h1>

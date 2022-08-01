@@ -8,7 +8,7 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
 from odoo.addons.octopart_connector.models.api_client_settings import ApiClientSettings
-from odoo.addons.octopart_connector.models.octopart_client import demo_match_mpns, demo_search_mpn
+# from odoo.addons.octopart_connector.models.octopart_client import demo_match_mpns, demo_search_mpn
 from datetime import date, datetime, time, timedelta
 
 _logger = logging.getLogger(__name__)
@@ -18,6 +18,9 @@ class OctoPartParts(models.Model):
     _description = "Retrieves date from octopart by part name"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = "id desc"
+
+    def _get_default_currency_id(self):
+        return self.env.company.currency_id.id
 
     avail_ids = fields.One2many("octopart.parts.availability", "avail_id")
     part_id = fields.Char(string="Provider's part ID", required=True)
@@ -34,8 +37,8 @@ class OctoPartParts(models.Model):
     median_price_1000_converted_currency = fields.Monetary(string="Median Price", default = 0, help="Median price for 1000qty")
     free_sample_url = fields.Char(string="Free sample")
     datasheet_url = fields.Char(string="Datasheet", help="Available only for pro subscribtion")
-    #TODO: default set to GBP manually, has to be match with company currency
-    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=147)
+
+    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=_get_default_currency_id)
     linked_part_id = fields.Many2one('product.template', 'Link to Product')
 
     avg_avail = fields.Integer(string="Total Available", help="Avarage avail of the part", default=None)
@@ -254,11 +257,16 @@ class OctoPartParts(models.Model):
 
         return client
 
-    def add_manufacturer(self,manufacturer):
-        return self.env['octopart.parts.manufacturers'].create({
-        'manufacturer_id':manufacturer['id'],
-        'name':manufacturer['name']
-        }).id
+    def add_contact(self,contact, manufacturer = False):
+
+        return self.env['res.partner'].create({
+         'contact_id':contact.id,
+         'name':contact.name,
+         'is_verified':contact.is_verified,
+         'website':contact.homepage_url,
+         'provider': self.provider,
+         'is_manufacturer': manufacturer
+         }).id
 
     #new module parts category has to be created
     def add_category(self, category):
@@ -266,34 +274,27 @@ class OctoPartParts(models.Model):
 
 # receive value from API search and updates record
     def update_record(self, part):
-
-        if (self._is_part_exist(part['part_id'], part['provider'])):
+        print(f"update record, received part = {type(part)}")
+        if (self._is_part_exist(part.part_id, part.provider)):
             self.name = ""
         else:
-            self.part_id = part['part_id']
-            self.manufacturer =  self.add_manufacturer(part['manufacturer'])
-            self.provider = part['provider']
-            if part['manufacturer_url']:
-                self.manufacturer_url = '<a href= "' + part['manufacturer_url']+'" target="_blank"> Manufacturer URL </a>'
-            self.description = part['description']
-            if part['provider_url']:
-                self.octopart_url = '<a href= "' + part['provider_url'] +'" target="_blank">Octopart URL</a>'
+            self.part_id = part.part_id
+            self.provider = part.provider
+            self.manufacturer =  self.add_contact(part.manufacturer, True) # adds contact with mfr =true
 
-            if part['image_url']:
-                print(f"image_url = {part['image_url']} - {type(part['image_url'])}")
-                self.image = '<img src = "' + part['image_url'] + '" width="150px">'
+            part.manufacturer_url = part.manufacturer_url
+            self.description = part.description
+            self.octopart_url = part.provider_url
+            if part.image_url:
+                self.image = '<img src = "' + part.image_url + '" width="150px">'
 
-            if part['factory_lead_time']:
-                self.est_factory_lead_time = part['factory_lead_time']
+            self.est_factory_lead_time = part.factory_lead_time
 
-            if part['median_price']:
-                self.median_price_1000_converted_currency = part['median_price']
+            self.median_price_1000_converted_currency = part.median_price
 
-            if part['free_sample_url']:
-                self.free_sample_url = '<a href="'+ part['free_sample_url']+'" target="_blank">Free Sample</a>'
+            self.free_sample_url = part.free_sample_url
 
-            if part['datasheet_url']:
-                self.datasheet_url = '<a href="'+ part['datasheet_url']+'" target="_blank">Datasheet</a>'
+            self.datasheet_url = part.datasheet_url
 
     @api.onchange('name')
     def _match_parts(self):
@@ -302,8 +303,8 @@ class OctoPartParts(models.Model):
             client = self.get_api_client()
 
             mpn = self.name
-            result = client.match_mpns(str(mpn))
-            # result = demo_match_mpns(client, str(mpn), client.subscription)
+            result = client.match_mpns(str(mpn), self.currency_id.name)
+
             self.update_record(result)
 
     #update availability with given query result
@@ -313,10 +314,20 @@ class OctoPartParts(models.Model):
         part_id = result['part_id']
         name = result['mpn']
         for s in result['sellers']:
-            seller = self.env['octopart.parts.vendors'].create({
+
+            seller_id = self.env['res.partner'].create({
             'vendor_id':s['id'],
-            'name':s['name']
+            'name':s['name'],
+            'provider': self.provider,
+            'website': s['homepage_url'],
+            'is_verified':s['is_verified'],
+            'is_authorized' : s['is_authorized'],
+            'is_broker' : s['is_broker']
             }).id
+            # seller = self.env['octopart.parts.vendors'].create({
+            # 'vendor_id':s['id'],
+            # 'name':s['name']
+            # }).id
             for offer in s['offers']:
                 stock_level = offer['stock_level']
                 stock_avail = 'false'
@@ -336,7 +347,7 @@ class OctoPartParts(models.Model):
                         'currency_id': self.currency_id.id,
                         'part_id':part_id,
                         'name':name,
-                        'seller':seller,
+                        'seller_id':seller_id,
                         'stock_level': stock_level,
                         'stock_avail': stock_avail,
                         'sku': sku,

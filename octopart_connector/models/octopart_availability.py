@@ -18,7 +18,8 @@ class OctoPartAvailability(models.Model):
     part_id = fields.Char(readonly=True)
     name = fields.Char(required=True, readonly=True)
     date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)
-    seller = fields.Many2one('octopart.parts.vendors',required=True)
+    seller = fields.Many2one('octopart.parts.vendors')
+    seller_id = fields.Many2one('res.partner', string="Contact")
     offer_url = fields.Char(readonly=True)
     stock_level = fields.Integer(readonly=True)
     stock_avail = fields.Selection([
@@ -31,7 +32,8 @@ class OctoPartAvailability(models.Model):
     price = fields.Monetary(currency_field='currency_id', string="Price", readonly=True)
     currency = fields.Char(string="Vendor Currency", readonly=True)
     batch_qty = fields.Integer(string="Min QTY", readonly=True)
-    seller_category_ids = fields.Many2one('octopart.parts.vendors.category', related="seller.category_id")
+    # seller_category_ids = fields.Many2one('octopart.parts.vendors.category', related="seller.category_id")
+    seller_category_ids = fields.Many2many('res.partner.category', related="seller_id.category_id")
     seller_status = fields.Boolean(related="seller.confirmed_vendor")
 
     @api.onchange("stock_level")
