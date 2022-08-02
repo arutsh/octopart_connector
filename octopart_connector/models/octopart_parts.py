@@ -319,22 +319,9 @@ class OctoPartParts(models.Model):
         part_id = result.part_id
         name = result.mpn
         for s in result.sellers:
-            print(f"seller = {s}")
 
-            # seller_id = self.env['res.partner'].create({
-            # 'vendor_id':s['id'],
-            # 'name':s['name'],
-            # 'provider': self.provider,
-            # 'website': s['homepage_url'],
-            # 'is_verified':s['is_verified'],
-            # 'is_authorized' : s['is_authorized'],
-            # 'is_broker' : s['is_broker']
-            # }).id
             seller_id = self.add_contact(s)
-            # seller = self.env['octopart.parts.vendors'].create({
-            # 'vendor_id':s['id'],
-            # 'name':s['name']
-            # }).id
+
             for offer in s.offers:
                 stock_level = offer.stock_level
                 stock_avail = 'false'
@@ -343,6 +330,7 @@ class OctoPartParts(models.Model):
                 offer_url = offer.offer_url
                 sku = offer.sku
                 moq = offer.moq
+                updated = offer.updated
                 for p in offer.prices:
                     price = p.converted_price
                     currency = p.converted_currency
@@ -357,6 +345,7 @@ class OctoPartParts(models.Model):
                         'seller_id':seller_id,
                         'stock_level': stock_level,
                         'stock_avail': stock_avail,
+                        'update_from_vendor': updated,
                         'sku': sku,
                         'moq': moq,
                         'price': price,

@@ -53,7 +53,7 @@
             <group>
               <group>
                 <h1>  <field name="name" attrs="{'readonly': [('id', '!=', False)]}"/> </h1>
-                <field name="linked_part_id" invisible='1' />
+                <field name="linked_part_id" invisible='0' />
                 <field name="currency_id" invisible='1'/>
                 <!-- <field name="manufacturer" attrs="{'readonly': [('id', '!=', False)]}"/> -->
                 <field name="manufacturer_id" attrs="{'readonly': [('id', '!=', False)]}"/>

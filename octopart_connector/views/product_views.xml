@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
               <xpath expr="//page[@name='inventory']" position="after">
-                  <page  string="Octopart">
+                  <page  string="Linked Components">
 
                       <field name="octopart_linked" invisible='1' />
                       <group>
@@ -22,11 +22,12 @@
                             <field name="seller_category_ids" widget="many2many_tags" />
                             <field name="last_available_stock" />
                             <field name="last_available_stock_qty" />
-                            <field name="last_available_stock_url" string="Offered by" widget="html" readonly="1" />
+                            <field name="last_available_stock_url" string="Offered by" widget="url" readonly="1" />
                       </group>
                       </group>
                       <group>
                         <field name="linked_part_ids" nolabel="1"/>
+
                       </group>
 
                   </page>

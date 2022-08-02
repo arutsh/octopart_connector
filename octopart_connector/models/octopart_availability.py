@@ -35,6 +35,7 @@ class OctoPartAvailability(models.Model):
     # seller_category_ids = fields.Many2one('octopart.parts.vendors.category', related="seller.category_id")
     seller_category_ids = fields.Many2many('res.partner.category', related="seller_id.category_id")
     seller_status = fields.Boolean(related="seller.confirmed_vendor")
+    update_from_vendor = fields.Date(default=(fields.Datetime.today()),string="Updated with Vendor", copy=False)
 
     @api.onchange("stock_level")
     def _update_stock_avail(self):

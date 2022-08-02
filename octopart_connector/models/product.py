@@ -44,14 +44,6 @@ class ProductTemplate(models.Model):
         return domain
 
 
-    # def _update_category_ids(self):
-    #     _logger.info("OCTPART PRODUCTs: _update_category_ids")
-    #     for record in self:
-    #         if(record.linked_part_ids):
-    #             for i in record.linked_part_ids:
-    #                 i.seller_category_ids = self.seller_category_ids
-    #                 _logger.info("OCTPART PRODUCTs: _onchange_category_ids %s", i.seller_category_ids)
-
     @api.depends("linked_part_ids.last_available_stock")
     def _compute_last_available_stock(self):
         _logger.info("OCTPART PRODUCTs: _compute_last_available_stock")
