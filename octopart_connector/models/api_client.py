@@ -5,10 +5,12 @@ import os
 #Parrent class for API clients
 class ApiClient():
 
-    def __init__(self, name, token, endpoint, headername='token'):
+    def __init__(self, name, token, client_id, client_secret, endpoint, headername='token'):
         print(f"I am ApiCLient init {token} ")
         self.name = name
         self.token = token
+        self.client_id = client_id
+        self.client_secret = client_secret
         self.endpoint = endpoint
         self.headername = headername
 
@@ -41,7 +43,7 @@ class ApiClient():
             response = urllib.request.urlopen(req)
             return response.read().decode('utf-8')
         except urllib.error.HTTPError as e:
-            print((e.read()))
+            print(f" can not get response from octopart: {e.read()}")
             print('')
             raise e
     #new API client has to request this  for each part and return dict according to defined struct
@@ -55,12 +57,12 @@ class ApiClient():
         return ContactData(manufacturer)
 
     def get_seller_data(self):
-        return get_contact_data()
+        return self.get_contact_data()
 
     def get_offers_data(self):
-        return OfferData
+        return OfferData()
     def get_prices_data(self):
-        return PriceData
+        return PriceData()
 
 
 class PartData():
@@ -81,11 +83,34 @@ class PartData():
         self.total_avail =  None
         self.avg_avail = None
 
-class OctoPartAvailabilityData():
+    def __str__(self):
+        return (f'''Part_id =  {self.part_id} \n
+                    name =  {self.name} \n
+                    Manufacturer URL =  {self.manufacturer_url} \n
+                    Desc =  {self.description} \n
+                    Provider = {self.provider} \n
+                    Provider_URL = {self.provider_url} \n
+                    Image = {self.image_url} \n
+                    Lead time = {self.factory_lead_time} \n
+                    Median Price = {self.median_price} \n
+                    Free sample = {self.free_sample_url} \n
+                    Datasheet = {self.datasheet_url} \n
+                    Manufacturer = {self.manufacturer} \n
+                    Category = {self.category}\n
+                    Total Avail = { self.total_avail} \n
+                    Avg Avail = {self.avg_avail}''')
+
+class PartAvailabilityData():
     def __init__(self):
         self.part_id = None
         self.mpn =  None
         self.sellers = [], # sellers is list of sellers defined by ContactData class
+
+    def __str__(self):
+        return f''' part_id  = {self.part_id}
+                    mpn = {self.mpn}
+                    sellers = {self.sellers}
+        '''
 
 class ContactData():
     def  __init__(self, manufacturer=False):
@@ -96,8 +121,19 @@ class ContactData():
         self.is_authorized = None #boolean
         self.is_broker = None #Boolean
         self.homepage_url = None
+        self.is_distributor_api = None
         if not manufacturer:
             self.offers = [] # offers is list of offers from each seller, defined OfferData class
+
+    def __str__(self):
+        return f''' id = {self.id}
+                    name = {self.name}
+                    is_verified = {self.is_verified}
+                    is_authorized = {self.is_authorized}
+                    is_broker = {self.is_broker}
+                    is_distributor_api = {self.is_distributor_api}
+                    homepage_url = {self.homepage_url}
+            '''
 
 class OfferData():
     def __init__(self):
@@ -112,6 +148,18 @@ class OfferData():
         self.order_multiple = None
         self.prices = []  # is list of prices defined by PriceData classs
 
+    def __str__(self):
+        return f''' id = {self.id}
+                    stock_level = {self.stock_level}
+                    offer_url = {self.offer_url}
+                    sku = {self.sku}
+                    moq = {self.moq}
+                    packaging = {self.packaging}
+                    updated = {self.updated}
+                    multipack_quantity = {self.multipack_quantity}
+                    order_multiple = {self.order_multiple}
+                    prices = {self.prices}
+        '''
 class PriceData():
     def __init__(self):
        self.quantity = None
@@ -120,3 +168,13 @@ class PriceData():
        self.converted_currency = None
        self.conversion_rate = None
        self.currency = None
+
+
+    def __str__(self):
+        return f''' quantity = {self.quantity}
+                    price = {self.price}
+                    converted_price = {self.converted_price}
+                    converted_currency = {self.converted_currency}
+                    conversion_rate = {self.conversion_rate}
+                    currency = {self.currency}
+                '''

@@ -20,7 +20,10 @@
                           <field name="client_url"/>
                           <label for="api_token" string="Octopart api token"/>
                           <field name="api_token"/>
-
+                          <label for="client_id" string="client id if available"/>
+                          <field name="client_id"/>
+                          <label for="client_secret" string="client secret if available"/>
+                          <field name="client_secret"/>
 
                         </div>
                     </div>

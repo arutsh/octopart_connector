@@ -20,7 +20,7 @@
         <field name="stock_level"/>
         <field name="price" widget="monetary"/>
         <field name="batch_qty"/>
-        <field name="offer_url" widget="html"/>
+        <field name="offer_url" widget="url" placeholder="Offer URL"/>
         <field name="seller_status"/>
       </tree>
     </field>
@@ -57,7 +57,7 @@
             <field name="stock_level"/>
             <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
             <field name="batch_qty"/>
-            <field name="offer_url" widget="html"/>
+            <field name="offer_url" widget="url"/>
             <field name="seller_category_ids" string="Category" widget="many2many_tags"/>
           </group>
         </sheet>

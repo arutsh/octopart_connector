@@ -17,9 +17,10 @@
         <field name="description"/>
         <field name="provider"/>
         <field name="date"/>
-        <field name="manufacturer"/>
+        <!-- <field name="manufacturer"/> -->
+        <field name="manufacturer_id"/>
         <field name="currency_id"/>
-        <field name="manufacturer_url" widget="html"/>
+        <field name="manufacturer_url" widget="url"/>
 
       </tree>
     </field>
@@ -34,9 +35,10 @@
         <field name="description"/>
         <field name="provider"/>
         <field name="date"/>
-        <field name="manufacturer"/>
+        <!-- <field name="manufacturer"/> -->
+        <field name="manufacturer_id"/>
         <group expand="1" string="Group By">
-          <filter string="Manufacturer" name="manufacturer" context="{'group_by':'manufacturer'}"/>
+          <filter string="Manufacturer" name="manufacturer_id" context="{'group_by':'manufacturer_id'}"/>
         </group>
       </search>
     </field>
@@ -53,7 +55,8 @@
                 <h1>  <field name="name" attrs="{'readonly': [('id', '!=', False)]}"/> </h1>
                 <field name="linked_part_id" invisible='1' />
                 <field name="currency_id" invisible='1'/>
-                <field name="manufacturer" attrs="{'readonly': [('id', '!=', False)]}"/>
+                <!-- <field name="manufacturer" attrs="{'readonly': [('id', '!=', False)]}"/> -->
+                <field name="manufacturer_id" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="provider" />
                 <field name="manufacturer_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="octopart_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
@@ -87,13 +90,13 @@
                       <field name="currency_id" invisible="1" />
                       <field name = "date"/>
                       <field name = "name"/>
-                      <field name = "seller"/>
+                      <field name = "seller_id"/>
                       <field name="moq"/>
                       <field name="stock_level"/>
                       <field name="stock_avail"/>
                       <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                       <field name="batch_qty"/>
-                      <field name="offer_url" widget="html" readonly="1"/>
+                      <field name="offer_url" widget="url" placeholder="Offer URL" readonly="1"/>
                       <field name="seller_status"/>
                     </tree>
                 </field>
@@ -113,7 +116,7 @@
                 <field name="max_price"/>
                 <field name="avg_price"/>
                 <field name="last_available_stock_qty"/>
-                <field name="last_available_stock_url" widget="html"/>
+                <field name="last_available_stock_url" widget="url"/>
               </group>
             </page>
           </notebook>

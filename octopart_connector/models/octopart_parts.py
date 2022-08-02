@@ -27,7 +27,9 @@ class OctoPartParts(models.Model):
     provider = fields.Char(string="Provider", help="part information was retrie from this provider")
     name = fields.Char(required=True)
     date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)
-    manufacturer = fields.Many2one('octopart.parts.manufacturers',required=True)
+    # manufacturer = fields.Many2one('octopart.parts.manufacturers',required=True)
+    manufacturer_id = fields.Many2one('res.partner', string="Manufacturer")
+
     manufacturer_url = fields.Char()
     description = fields.Text()
     octopart_url = fields.Char()
@@ -262,8 +264,11 @@ class OctoPartParts(models.Model):
         return self.env['res.partner'].create({
          'contact_id':contact.id,
          'name':contact.name,
-         'is_verified':contact.is_verified,
-         'website':contact.homepage_url,
+         'is_verified':contact.is_verified or None,
+         'is_authorized' : contact.is_authorized or None,
+         'is_broker' : contact.is_broker or None ,
+         'is_distributor_api': contact.is_distributor_api or None,
+         'website':contact.homepage_url or None,
          'provider': self.provider,
          'is_manufacturer': manufacturer
          }).id
@@ -280,9 +285,9 @@ class OctoPartParts(models.Model):
         else:
             self.part_id = part.part_id
             self.provider = part.provider
-            self.manufacturer =  self.add_contact(part.manufacturer, True) # adds contact with mfr =true
+            self.manufacturer_id =  self.add_contact(part.manufacturer, True) # adds contact with mfr =true
 
-            part.manufacturer_url = part.manufacturer_url
+            self.manufacturer_url = part.manufacturer_url
             self.description = part.description
             self.octopart_url = part.provider_url
             if part.image_url:
@@ -309,37 +314,39 @@ class OctoPartParts(models.Model):
 
     #update availability with given query result
     def update_availability(self, result):
-
+        print(f"update record, received result = {type(result)}")
         avail_ids = []
-        part_id = result['part_id']
-        name = result['mpn']
-        for s in result['sellers']:
+        part_id = result.part_id
+        name = result.mpn
+        for s in result.sellers:
+            print(f"seller = {s}")
 
-            seller_id = self.env['res.partner'].create({
-            'vendor_id':s['id'],
-            'name':s['name'],
-            'provider': self.provider,
-            'website': s['homepage_url'],
-            'is_verified':s['is_verified'],
-            'is_authorized' : s['is_authorized'],
-            'is_broker' : s['is_broker']
-            }).id
+            # seller_id = self.env['res.partner'].create({
+            # 'vendor_id':s['id'],
+            # 'name':s['name'],
+            # 'provider': self.provider,
+            # 'website': s['homepage_url'],
+            # 'is_verified':s['is_verified'],
+            # 'is_authorized' : s['is_authorized'],
+            # 'is_broker' : s['is_broker']
+            # }).id
+            seller_id = self.add_contact(s)
             # seller = self.env['octopart.parts.vendors'].create({
             # 'vendor_id':s['id'],
             # 'name':s['name']
             # }).id
-            for offer in s['offers']:
-                stock_level = offer['stock_level']
+            for offer in s.offers:
+                stock_level = offer.stock_level
                 stock_avail = 'false'
                 if stock_level > 0 :
                     stock_avail='true'
-                offer_url = '<a href= "' + offer['offer_url'] +'" target="_blank">'+s['name']+'</a>'
-                sku = offer['sku']
-                moq = offer['moq']
-                for p in offer['prices']:
-                    price = p['converted_price']
-                    currency = p['converted_currency']
-                    batch_qty = p['quantity']
+                offer_url = offer.offer_url
+                sku = offer.sku
+                moq = offer.moq
+                for p in offer.prices:
+                    price = p.converted_price
+                    currency = p.converted_currency
+                    batch_qty = p.quantity
                     _logger.info("OCTOPART PARTS: #create record for each seller and price group")
 
                     ret = self.env['octopart.parts.availability'].create({
@@ -357,6 +364,7 @@ class OctoPartParts(models.Model):
                         'batch_qty': batch_qty,
                         'offer_url': offer_url
                     })
+                    print(f"creating new record = {ret}")
 
 
     def check_availability(self):

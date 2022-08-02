@@ -4,6 +4,7 @@
 from . import api_client_settings
 from . import api_client
 from . import octopart_client
+from . import nexar_client
 from . import octopart_parts
 from . import octopart_availability
 from . import octopart_manufacturers
