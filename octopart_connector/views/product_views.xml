@@ -22,7 +22,7 @@
                             <field name="seller_category_ids" widget="many2many_tags" />
                             <field name="last_available_stock" />
                             <field name="last_available_stock_qty" />
-                            <field name="last_available_stock_url" string="Offered by" widget="url" readonly="1" />
+                            <field name="last_available_stock_url" string="Offered by" widget="url" placeholder="Offer" readonly="1" />
                       </group>
                       </group>
                       <group>
