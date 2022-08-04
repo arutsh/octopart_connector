@@ -45,21 +45,7 @@ class OctoPartAvailability(models.Model):
             self.stock_avail = 'false'
 
 
-    def add_to_supplier_info(self):
-        try:
-            ret = self.env['product.supplierinfo'].create({
-                'name' : self.seller_id.id,
-                'product_name' : self.name,
-                'product_code' : self.sku,
-                'min_qty':self.batch_qty,
-                'price' : self.price,
-                'date_start' : fields.Datetime.today(),
-                'date_end' : fields.Datetime.today(),
-                'product_tmpl_id' : self.avail_id.linked_part_id.id
-            })
-        except Exception as e:
-            raise UserError(e)
-        return True
+
 
     def unlink(self):
         # Do some business logic, modify vals...

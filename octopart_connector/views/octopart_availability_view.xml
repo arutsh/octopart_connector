@@ -61,7 +61,6 @@
             <field name="offer_url" widget="url"/>
             <field name="seller_category_ids" string="Category" widget="many2many_tags"/>
             <field name="update_from_vendor"/>
-            <button name="add_to_supplier_info" string="Order" type="object"/>
           </group>
         </sheet>
       </form>
