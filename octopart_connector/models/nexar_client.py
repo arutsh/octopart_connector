@@ -8,7 +8,9 @@ import time
 from typing import Dict
 from copy import deepcopy
 from odoo.addons.octopart_connector.models.api_client import ApiClient
+import logging
 
+_logger = logging.getLogger(__name__)
 NEXAR_URL = "https://api.nexar.com/graphql"
 PROD_TOKEN_URL = "https://identity.nexar.com/connect/token"
 
@@ -197,9 +199,9 @@ class NexarApiClient(ApiClient):
     #         return self._search_pro(mpn, currency)
 
     def match_mpns(self, mpn, currency='GBP'):
-
+        _logger.info("nexar client match mpn, received: %s", mpn)
         matches = self._search_mpn(mpn, currency)
-
+        _logger.info("nexar client matches: %s", matches)
 
         # ## TODO:  Remove after # DEBUG:
         # matches = STRING
@@ -331,6 +333,8 @@ class NexarApiClient(ApiClient):
           "limit":1,
 
         }
+
+        _logger.info("VAR IS %s", var)
         resp = self.execute(query, var)
 
 

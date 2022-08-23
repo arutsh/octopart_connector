@@ -270,7 +270,8 @@ class OctoPartParts(models.Model):
          'is_distributor_api': contact.is_distributor_api or None,
          'website':contact.homepage_url or None,
          'provider': self.provider,
-         'is_manufacturer': manufacturer
+         'is_manufacturer': manufacturer,
+         'company_type': 'company'
          }).id
 
     #new module parts category has to be created
@@ -301,16 +302,58 @@ class OctoPartParts(models.Model):
 
             self.datasheet_url = part.datasheet_url
 
+
+
+#the function create val dict for create function based on the given part name
+    def getValToCreate(self, mpn, curr='GBP'):
+        #_logger.warning("****getValueToCreate received %s", mpn)
+        part = self._match_parts(mpn, curr)
+        val = {}
+        val['name'] = mpn
+        val['part_id'] = part.part_id
+        val['provider'] = part.provider
+        val['manufacturer_id'] = self.add_contact(part.manufacturer, True)  # adds contact with mfr =true
+        val['manufacturer_url'] = part.manufacturer_url
+        val['description'] = part.description
+        val['octopart_url'] = part.provider_url
+        if part.image_url:
+            val['image'] = '<img src = "' + part.image_url + '" width="150px">'
+
+        val['est_factory_lead_time'] = part.factory_lead_time
+
+        val['median_price_1000_converted_currency'] = part.median_price
+
+        val['free_sample_url'] = part.free_sample_url
+
+        val['datasheet_url'] = part.datasheet_url
+
+        return val
+
+
+    @api.model
+    def create(self, val):
+        # if part id is not set, then try to fetch from provider.
+        if not val.get('part_id'):
+            val = self.getValToCreate(val.get('name'))
+            _logger.info(" *** after matching val is %s", val)
+
+        return super().create(val)
+
+
+
     @api.onchange('name')
-    def _match_parts(self):
-        _logger.info("OCTOPART PARTS: ___selecting value")
-        if(self.name):
-            client = self.get_api_client()
-
-            mpn = self.name
-            result = client.match_mpns(str(mpn), self.currency_id.name)
-
+    def getPartDetails(self):
+        if self.name:
+            result = self._match_parts(self.name, self.currency_id.name)
             self.update_record(result)
+
+
+    def _match_parts(self, mpn, curr='GBP'):
+        _logger.info("OCTOPART PARTS: ___selecting value")
+        client = self.get_api_client()
+        return client.match_mpns(str(mpn), curr)
+
+
 
     #update availability with given query result
     def update_availability(self, result):
