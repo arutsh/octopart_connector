@@ -284,17 +284,18 @@ class NexarApiClient(ApiClient):
         d = self.get_part_data()
 
         for match in matches:
-            if (match['part']['mpn']).lower() == mpn.lower():
+            if (match['part']['mpn']).upper() == mpn.upper():
 
                 d.part_id = match['part']['id']
-                d.name = mpn
+                d.name = mpn.upper()
                 d.manufacturer_url = match['part']['manufacturerUrl']
                 d.description = match['part']['shortDescription']
                 d.provider = self.name
                 d.provider_url =  match['part']['octopartUrl']
                 if match['part']['bestImage']:
                     d.image_url = match['part']['bestImage']['url']
-                d.factory_lead_time = int(match['part']['estimatedFactoryLeadDays'])
+                if match['part']['estimatedFactoryLeadDays']:
+                    d.factory_lead_time = int(match['part']['estimatedFactoryLeadDays'])
                 if match['part']['medianPrice1000']:
                     d.median_price = float(match['part']['medianPrice1000']['convertedPrice'])
                 d.free_sample_url = match['part']['freeSampleUrl']

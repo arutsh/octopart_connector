@@ -334,7 +334,7 @@ class OctoPartParts(models.Model):
     def create(self, val):
         # if part id is not set, then try to fetch from provider.
         if not val.get('part_id'):
-            val = self.getValToCreate(val.get('name'))
+            val = self.getValToCreate(str(val.get('name').upper()))
             _logger.info(" *** after matching val is %s", val)
 
         return super().create(val)
@@ -344,6 +344,7 @@ class OctoPartParts(models.Model):
     @api.onchange('name')
     def getPartDetails(self):
         if self.name:
+            self.name = str(self.name).upper()
             result = self._match_parts(self.name, self.currency_id.name)
             self.update_record(result)
 
