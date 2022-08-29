@@ -43,7 +43,7 @@ class OctoPartParts(models.Model):
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=_get_default_currency_id)
     linked_part_id = fields.Many2one('product.template', 'Link to Product')
 
-    avg_avail = fields.Integer(string="Total Available", help="Avarage avail of the part", default=None)
+    avg_avail = fields.Integer(string="Total Available", help="Average avail of the part", default=None)
     total_avail = fields.Integer(string="Avg Available", help="Total Availability in the market", default=None)
 
 
@@ -406,6 +406,7 @@ class OctoPartParts(models.Model):
             dt = max(self.avail_ids.mapped('date'))
         else:
             dt = date.today()-timedelta(days=1)
+        _logger.info("check_availability: latest date is: %s", dt)
         #if latest update is smaller then today then refresh data, otherwise do nothing
         #TODO: this is not the best solution, in case we want to check updates regularly, several times per day
         if(dt <  date.today()):

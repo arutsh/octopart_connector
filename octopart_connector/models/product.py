@@ -30,6 +30,21 @@ class ProductTemplate(models.Model):
     seller_category_ids = fields.Many2many('octopart.parts.vendors.category', string="Category",
                                             help="Filter component by supplier categories. Categories has to be defined by admin from Octopart module page")
 
+    min_factory_lead_time = fields.Integer(string="min Factory LT", help="Shows min lT of linked parts", readonly=True, compute="_compute_min_lt")
+
+
+    @api.depends("linked_part_ids.est_factory_lead_time")
+    def _compute_min_lt(self):
+        for record in self:
+
+            if(record.linked_part_ids):
+
+                record.min_factory_lead_time = min(record.linked_part_ids.mapped('est_factory_lead_time'))
+            else:
+                record.min_factory_lead_time = None
+            _logger.info("computeing min LT %s", record.min_factory_lead_time)
+
+
     def set_category_domain(self, record):
         domain = []
         #check if there is choosen categroy
@@ -137,6 +152,7 @@ class ProductTemplate(models.Model):
 
 class ProductProduct(models.Model):
     _inherit = "product.product"
+
 
     def check_availability(self):
         for record in self:

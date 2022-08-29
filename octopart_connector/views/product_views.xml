@@ -14,8 +14,9 @@
                       <group>
                       <group attrs="{'invisible':[('octopart_linked','!=', True)]}">
                             <field name="min_price" />
+                            <field name="min_price" />
                             <field name="max_price" />
-                            <field name="avg_price" />
+                            <field name="min_factory_lead_time" />
                       </group>
                       <group attrs="{'invisible':[('octopart_linked','!=', True)]}">
                             <field name="manufacturers_ids"  widget="many2many_tags" string="Manufacturers" invisible="1"/>
