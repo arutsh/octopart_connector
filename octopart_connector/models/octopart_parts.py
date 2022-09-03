@@ -41,7 +41,7 @@ class OctoPartParts(models.Model):
     datasheet_url = fields.Char(string="Datasheet", help="Available only for pro subscribtion")
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=_get_default_currency_id)
-    linked_part_id = fields.Many2one('product.template', 'Link to Product')
+    linked_part_id = fields.Many2many('product.template', column1='product_template_id', column2='octopart_parts_id')
 
     avg_avail = fields.Integer(string="Total Available", help="Average avail of the part", default=None)
     total_avail = fields.Integer(string="Avg Available", help="Total Availability in the market", default=None)

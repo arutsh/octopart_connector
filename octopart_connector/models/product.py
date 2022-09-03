@@ -14,13 +14,13 @@ _logger = logging.getLogger(__name__)
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    linked_part_ids = fields.One2many('octopart.parts', 'linked_part_id')
+    linked_part_ids = fields.Many2many('octopart.parts', column1='octopart_parts_id', column2='product_template_id', string="Linked components")
     manufacturers_ids = fields.Many2many('octopart.parts.manufacturers', 'manufacturer_id')
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True)
     min_price = fields.Monetary(currency_field='currency_id', string="Min Price", compute="_compute_min_price", help="Min price during last 30 days based on retrieved data from octopart")
     max_price = fields.Monetary(currency_field='currency_id', string="Max Price", compute="_compute_max_price", help="Max price during last 30 days based on retrieved data from octopart")
-    avg_price = fields.Monetary(currency_field='currency_id', compute="_compute_avg_price", string = "Avg Price", help="Avg price during last 30 days based on retrieved data from octopart")
+
     octopart_linked = fields.Boolean(default=False, string="Link to Octopart", compute="_compute_link_status")
     last_available_stock = fields.Many2one("octopart.parts.availability", "Available Component", compute="_compute_last_available_stock")
 
@@ -31,7 +31,8 @@ class ProductTemplate(models.Model):
                                             help="Filter component by supplier categories. Categories has to be defined by admin from Octopart module page")
 
     min_factory_lead_time = fields.Integer(string="min Factory LT", help="Shows min lT of linked parts", readonly=True, compute="_compute_min_lt")
-
+    avg_price = fields.Monetary(currency_field='currency_id', compute="_compute_avg_price", string="Avg Price",
+                                help="Avg price during last 30 days based on retrieved data from octopart")
 
     @api.depends("linked_part_ids.est_factory_lead_time")
     def _compute_min_lt(self):
@@ -44,7 +45,14 @@ class ProductTemplate(models.Model):
                 record.min_factory_lead_time = None
             _logger.info("computeing min LT %s", record.min_factory_lead_time)
 
-
+    @api.depends("linked_part_ids.avg_price")
+    def _compute_avg_price(self):
+        #avg price is min median price of alternative components
+        for record in self:
+            if(record.linked_part_ids):
+                record.avg_price = min(record.linked_part_ids.mapped('median_price_1000_converted_currency'))
+            else:
+                record.avg_price = None
     def set_category_domain(self, record):
         domain = []
         #check if there is choosen categroy
@@ -114,15 +122,7 @@ class ProductTemplate(models.Model):
                 record.max_price = None
 
 
-    @api.depends("linked_part_ids.avg_price")
-    def _compute_avg_price(self):
-        for record in self:
-            if(record.linked_part_ids):
-                s =  sum(record.linked_part_ids.mapped('avg_price'))
-                l =  len(record.linked_part_ids.mapped('avg_price'))
-                record.avg_price = s/l
-            else:
-                record.avg_price = None
+
 
     def _compute_min_price_bom(self, moq_qty=None, start_date=None, end_date=None, seller_category = None):
         _logger.warning("OCTOPART Product Inhehtery: _compute_min_price_bom product template %s, %s", seller_category, self.name)

@@ -7,6 +7,7 @@
       <field name="context">{'search_default_available': True}</field>
   </record>
 
+
  <record id="octopart_parts_view_tree" model="ir.ui.view">
     <field name="name">octopart.parts.tree</field>
     <field name="model">octopart.parts</field>
@@ -53,7 +54,7 @@
             <group>
               <group>
                 <h1>  <field name="name" attrs="{'readonly': [('id', '!=', False)]}"/> </h1>
-                <field name="linked_part_id" invisible='0' />
+                <field name="linked_part_id" />
                 <field name="currency_id" invisible='1'/>
                 <!-- <field name="manufacturer" attrs="{'readonly': [('id', '!=', False)]}"/> -->
                 <field name="manufacturer_id" attrs="{'readonly': [('id', '!=', False)]}"/>
