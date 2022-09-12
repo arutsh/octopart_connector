@@ -40,7 +40,7 @@ class ProductTemplate(models.Model):
 
             if(record.linked_part_ids):
 
-                record.min_factory_lead_time = min(record.linked_part_ids.mapped('est_factory_lead_time'))
+                record.min_factory_lead_time = min(record.linked_part_ids.filtered(lambda i: i.est_factory_lead_time > 0).mapped('est_factory_lead_time')) or None
             else:
                 record.min_factory_lead_time = None
             _logger.info("computeing min LT %s", record.min_factory_lead_time)
@@ -50,7 +50,7 @@ class ProductTemplate(models.Model):
         #avg price is min median price of alternative components
         for record in self:
             if(record.linked_part_ids):
-                record.avg_price = min(record.linked_part_ids.mapped('median_price_1000_converted_currency'))
+                record.avg_price = min(record.linked_part_ids.filtered(lambda i: i.avg_price > 0).mapped('avg_price')) or None
             else:
                 record.avg_price = None
     def set_category_domain(self, record):
@@ -87,7 +87,6 @@ class ProductTemplate(models.Model):
                         dt = record.last_available_stock.date
                         qty = record.last_available_stock_qty
 
-
                         record.last_available_stock_qty = i.last_available_stock_qty
                         record.last_available_stock_url = i.last_available_stock_url
             else:
@@ -95,6 +94,7 @@ class ProductTemplate(models.Model):
                 record.last_available_stock = None
                 record.last_available_stock_qty = 0
                 record.last_available_stock_url = "<div>Not linked</div>"
+
 
 
     @api.depends("linked_part_ids")
@@ -108,10 +108,14 @@ class ProductTemplate(models.Model):
     @api.depends("linked_part_ids.min_price")
     def _compute_min_price(self):
         for record in self:
+            record.min_price = None
             if (record.linked_part_ids):
-                record.min_price = min(record.linked_part_ids.mapped('min_price'))
-            else:
-                record.min_price = None
+                #print("Min prices => ", [i.min_price for i in record.linked_part_ids.filtered(lambda i: i.min_price > 0)])
+                item = record.linked_part_ids.filtered(lambda i: i.min_price > 0)
+                if (item):
+                    record.min_price = min(item.mapped('min_price'))
+
+
 
     @api.depends("linked_part_ids.max_price")
     def _compute_max_price(self):
@@ -120,6 +124,7 @@ class ProductTemplate(models.Model):
                 record.max_price = max(record.linked_part_ids.mapped('max_price'))
             else:
                 record.max_price = None
+
 
 
 

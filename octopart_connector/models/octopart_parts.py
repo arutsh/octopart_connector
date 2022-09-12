@@ -43,13 +43,14 @@ class OctoPartParts(models.Model):
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=_get_default_currency_id)
     linked_part_id = fields.Many2many('product.template', column1='product_template_id', column2='octopart_parts_id')
     #linked_part_customer = fields.Many2one(related='linked_part_id.customer_id')
-    avg_avail = fields.Integer(string="Total Available", help="Average avail of the part", default=None)
-    total_avail = fields.Integer(string="Avg Available", help="Total Availability in the market", default=None)
+    avg_avail = fields.Integer(string="Avg Available", help="Average avail of the part", default=None)
+    total_avail = fields.Integer(string="Total Available", help="Total Availability in the market", default=None)
 
 
     #All fields below has to be reviewed and optimised
     min_price = fields.Monetary(currency_field='currency_id', compute="_compute_min_price", readonly=True)
     max_price = fields.Monetary(currency_field='currency_id', compute="_compute_max_price", readonly=True)
+    #avg_price set same as median_price_1000_converted_currency, used in products for now.
     avg_price = fields.Monetary(currency_field='currency_id', compute="_compute_avg_price", readonly=True)
     #FIXME: Maybe this two fields can be implemented from controller. so we receive this dates from user and update min, max, avg price based on it
     start_date = fields.Date(default=(fields.Datetime.today()),string="Start date", copy=False)
@@ -63,8 +64,38 @@ class OctoPartParts(models.Model):
 
     seller_category_ids = fields.Many2many('octopart.parts.vendors.category', string="Category")
 
+    def create_parts_by_matching_mpn(self, mpn, curr='GBP'):
+        '''receives new mpn and creates all patching parts received from client'''
+        print("i am test function called from query:", mpn)
+        _logger.info("OCTOPART PARTS: ___searching value")
+        client = self.get_api_client()
+        matches = client.search_mpns(str(mpn), curr)
+        newParts = []
+        for match in matches:
+            part = self.search([('part_id', '=', match.part_id), ('provider', '=', match.provider)])
+            if (part):
+                newParts.append(part)
+            else:
+                newParts.append(self.create(self.convertClientPartToComponent(match)))
+        return newParts
 
 
+    def convertClientPartToComponent(self, part):
+        '''Converts part received from Client to json for selfcreate function'''
+        return {
+            'name': part.name,
+            'part_id': part.part_id,
+            'provider': part.provider,
+            'manufacturer_id': self.add_contact(part.manufacturer, True),
+            'manufacturer_url':part.manufacturer_url,
+            'description':part.description,
+            'octopart_url':part.provider_url,
+            'image': part.image_url,
+            'est_factory_lead_time': part.factory_lead_time,
+            'median_price_1000_converted_currency': part.median_price,
+            'free_sample_url':part.free_sample_url,
+            'datasheet_url' : part.datasheet_url,
+        }
     def _update_category_ids(self, seller_category_ids):
         _logger.info("OCTPART PARTS: @api.onchange seller_category_ids")
         self.seller_category_ids = seller_category_ids
@@ -88,55 +119,43 @@ class OctoPartParts(models.Model):
     @api.depends("avail_ids.date")
     def _compute_last_available_stock(self):
         _logger.info("OCTPART PARTS: computing last available stock date")
+
         for record in self:
             #record.check_availability()
+            record.last_available_stock = None
+            record.last_available_stock_qty = None
+            record.last_available_stock_url = None
             if(record.avail_ids):
                 domain = self.set_category_domain(record)
 
                 item = record.avail_ids.filtered_domain(domain)
                 _logger.info("OCTPART PARTS: computing last available stock domain %s", item)
-                #item = item.filtered(lambda r: (r.stock_level > 0))
-                #_logger.info("OCTPART PARTS: computing last available stock domain filtering out 0 stock %s", item)
                 test = item.sorted(key = lambda r: (r.date, r.stock_level), reverse=True)
                 _logger.info("OCTPART PARTS: computing last available stock domain sorting %s", test)
-                #test = record.avail_ids.sorted(key = lambda r: (r.date, r.stock_level), reverse=True)
                 if(test):
                     _logger.info("OCTPART PARTS: computing last available stock domain sorting %s", test[0].stock_level)
                     record.last_available_stock = test[0].id
                     record.last_available_stock_qty = record.last_available_stock.stock_level
-                    if (record.last_available_stock_qty > 0):
+                    if record.last_available_stock_qty > 0:
                         record.last_available_stock_url = record.last_available_stock.offer_url
-                    else:
-                        record.last_available_stock_url = "<div>None</div>"
-                else:
-                    #TODO: Does not like same code twice :()
-                    record.last_available_stock = None
-                    record.last_available_stock_qty = None
-                    record.last_available_stock_url = "<div>None</div>"
 
-            else:
-                record.last_available_stock = None
-                record.last_available_stock_qty = None
-                record.last_available_stock_url = "<div>None</div>"
 
 
 
     @api.depends("avail_ids.price", "max_moq", "start_date", "end_date", "seller_category_ids")
     def _compute_min_price(self):
-        _logger.info("OCTPART PARTS: computing last available stock price")
-        _logger.info("OCTPART PARTS: computing last available stock price -> seller_cat: %s", self.seller_category_ids)
-
+        _logger.info("OCTPART PARTS: _compute_min_price")
         for record in self:
-            domain = record.define_domain(record.max_moq, record.start_date, record.end_date, record.seller_category_ids)
-            _logger.info("OCTPART PARTS: computing last available stock price -> Domain: %s", domain)
+            record.min_price = 0
+            domain = record.define_domain(record.max_moq, record.start_date, datetime.today(), record.seller_category_ids)
+            #_logger.info("OCTPART PARTS: computing last available stock price -> Domain: %s", domain)
             if(record.avail_ids):
-                res = record.avail_ids.filtered_domain(domain)
+                res = record.avail_ids.filtered_domain(domain).filtered(lambda i: i.price > 0)
                 if(res):
                     record.min_price = min(res.mapped('price'))
-                else:
-                    record.min_price = 0
-            else:
-                record.min_price = 0
+                    #_logger.info("OCTPART PARTS: _compute_min_price minprice %s", record.min_price)
+
+
 
     def compute_min_price_bom(self, moq_qty=None, start_date=None, end_date=None, seller_category = None):
         _logger.info("OCTOPART PARTS: compute min price BOM")
@@ -229,20 +248,16 @@ class OctoPartParts(models.Model):
         #testing config files
 
         for record in self:
+            record.max_price = None
             if(record.avail_ids):
                 record.max_price = max(record.avail_ids.mapped('price'))
-            else:
-                record.max_price = None
+
+
 
     @api.depends("avail_ids.price")
     def _compute_avg_price(self):
         for record in self:
-            if(record.avail_ids):
-                s =  sum(record.avail_ids.mapped('price'))
-                l =  len(record.avail_ids.mapped('price'))
-                record.avg_price = s/l
-            else:
-                record.avg_price = None
+            record.avg_price = record.median_price_1000_converted_currency
 
     def _is_part_exist(self, part_id, provider):
         ## TODO: add provider name for filtering after provider is created
@@ -282,8 +297,10 @@ class OctoPartParts(models.Model):
     def update_record(self, part):
         print(f"update record, received part = {type(part)}")
         if (self._is_part_exist(part.part_id, part.provider)):
-            self.name = ""
+            #self.name = ""
+            pass
         else:
+            self.name = part.name
             self.part_id = part.part_id
             self.provider = part.provider
             self.manufacturer_id =  self.add_contact(part.manufacturer, True) # adds contact with mfr =true
@@ -336,6 +353,7 @@ class OctoPartParts(models.Model):
         if not val.get('part_id'):
             val = self.getValToCreate(str(val.get('name').upper()))
             _logger.info(" *** after matching val is %s", val)
+
 
         return super().create(val)
 
@@ -413,7 +431,7 @@ class OctoPartParts(models.Model):
             _logger.info("API: __adding values")
 
             client = self.get_api_client()
-            q = client.search_mpn_availability(self.name, self.part_id, self.currency_id.name)
+            q = client.match_mpn_availability(self.name, self.part_id, self.currency_id.name)
             self.update_availability(q)
 
 

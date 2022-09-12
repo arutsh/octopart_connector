@@ -192,24 +192,27 @@ class NexarApiClient(ApiClient):
                 }
                 '''
     #
-    # def search_mpns(self, mpn, currency="GBP"):
-    #     if self.subscription == 'basic':
-    #         return self._search_basic(mpn, currency)
-    #     if self.subscription == 'pro':
-    #         return self._search_pro(mpn, currency)
-
-    def match_mpns(self, mpn, currency='GBP'):
+    def search_mpns(self, mpn, currency='GBP'):
         _logger.info("nexar client match mpn, received: %s", mpn)
         matches = self._search_mpn(mpn, currency)
         _logger.info("nexar client matches: %s", matches)
 
         # ## TODO:  Remove after # DEBUG:
         # matches = STRING
+        return self.filter_parts_searches(matches)
+
+    def match_mpns(self, mpn, currency='GBP'):
+        _logger.info("nexar client match mpn, received: %s", mpn)
+        matches = self._match_mpn(mpn, currency)
+        _logger.info("nexar client matches: %s", matches)
+
+        # ## TODO:  Remove after # DEBUG:
+        # matches = STRING
         return self.filter_part_matches(matches, mpn)
 
-    def search_mpn_availability(self, mpn, pid, currency='GBP'):
+    def match_mpn_availability(self, mpn, pid, currency='GBP'):
 
-        matches = self._search_mpn_availability(mpn)
+        matches = self._match_mpn_availability(mpn)
 
         #matches = [{'part': {'id': '88318820', 'mpn': 'LTC3026EMSE#PBF', 'sellers': [{'company': {'id': '12899', 'homepage_url': 'https://extremecomponents.com', 'is_verified': False, 'name': 'Extreme Components', 'slug': 'extreme-components'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '663797666', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=29167&sig=0e5a5b7&vpid=663797666', 'inventory_level': 135, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-04-23T07:52:45Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '12079', 'homepage_url': 'http://www.sourceability.com', 'is_verified': False, 'name': 'Sourceability', 'slug': 'sourceability'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '662606679', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=28281&sig=0a37f74&vpid=662606679', 'inventory_level': 43, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-06-29T15:13:15Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10079', 'homepage_url': 'http://www.abacuselect.com/', 'is_verified': False, 'name': 'Abacus Technologies', 'slug': 'abacus-technologies'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '462282693', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=25917&sig=0a9b3d3&vpid=462282693', 'inventory_level': 0, 'sku': 'LTC3026EMSEPBF', 'moq': None, 'packaging': None, 'updated': '2022-07-16T00:02:43Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}, {'company': {'id': '10643', 'homepage_url': 'http://iodparts.com', 'is_verified': False, 'name': 'iodParts', 'slug': 'iodparts'}, 'is_authorized': False, 'is_broker': False, 'is_rfq': False, 'offers': [{'id': '671948368', 'click_url': 'https://octopart.com/click/track?ai4=134978&country=GB&ct=offers&ppid=88318820&sid=26822&sig=065aa5d&vpid=671948368', 'inventory_level': 78, 'sku': 'LTC3026EMSE#PBF', 'moq': None, 'packaging': None, 'updated': '2022-07-15T11:22:57Z', 'multipack_quantity': None, 'order_multiple': None, 'prices': []}]}]}}]
 
@@ -285,37 +288,50 @@ class NexarApiClient(ApiClient):
 
         for match in matches:
             if (match['part']['mpn']).upper() == mpn.upper():
-
-                d.part_id = match['part']['id']
-                d.name = mpn.upper()
-                d.manufacturer_url = match['part']['manufacturerUrl']
-                d.description = match['part']['shortDescription']
-                d.provider = self.name
-                d.provider_url =  match['part']['octopartUrl']
-                if match['part']['bestImage']:
-                    d.image_url = match['part']['bestImage']['url']
-                if match['part']['estimatedFactoryLeadDays']:
-                    d.factory_lead_time = int(match['part']['estimatedFactoryLeadDays'])
-                if match['part']['medianPrice1000']:
-                    d.median_price = float(match['part']['medianPrice1000']['convertedPrice'])
-                d.free_sample_url = match['part']['freeSampleUrl']
-                if match['part']['bestDatasheet']:
-                    d.datasheet_url =  match['part']['bestDatasheet']['url']
-                if match['part']['category']:
-                    d.category = match['part']['category']
-                if match['part']['manufacturer']:
-                    print(match['part']['manufacturer'])
-                    d.manufacturer.id = match['part']['manufacturer']['id']
-                    d.manufacturer.name = match['part']['manufacturer']['name']
-                    d.manufacturer.is_verified = match['part']['manufacturer']['isVerified']
-                    d.manufacturer.homepage_url = match['part']['manufacturer']['homepageUrl']
-                d.avg_avail = match['part']['avgAvail']
-                d.total_avail = match['part']['totalAvail']
-
+                d = self.translateToPartData(match)
         return(d)
 
+    def filter_parts_searches(self, matches):
+        d = self.get_part_data()
+        d_list = []
 
-    def _search_mpn(self, mpn, currency='GBP'):
+        for match in matches:
+            d_list.append(self.translateToPartData(match))
+
+        return(d_list)
+
+    def translateToPartData(self, match):
+        d = self.get_part_data()
+        d.part_id = match['part']['id']
+        d.name = match['part']['mpn'].upper()
+        d.manufacturer_url = match['part']['manufacturerUrl']
+        d.description = match['part']['shortDescription']
+        d.provider = self.name
+        d.provider_url = match['part']['octopartUrl']
+        if match['part']['bestImage']:
+            d.image_url = match['part']['bestImage']['url']
+        if match['part']['estimatedFactoryLeadDays']:
+            d.factory_lead_time = int(match['part']['estimatedFactoryLeadDays'])
+        if match['part']['medianPrice1000']:
+            d.median_price = float(match['part']['medianPrice1000']['convertedPrice'])
+        d.free_sample_url = match['part']['freeSampleUrl']
+        if match['part']['bestDatasheet']:
+            d.datasheet_url = match['part']['bestDatasheet']['url']
+        if match['part']['category']:
+            d.category = match['part']['category']
+        if match['part']['manufacturer']:
+            print(match['part']['manufacturer'])
+            d.manufacturer.id = match['part']['manufacturer']['id']
+            d.manufacturer.name = match['part']['manufacturer']['name']
+            d.manufacturer.is_verified = match['part']['manufacturer']['isVerified']
+            d.manufacturer.homepage_url = match['part']['manufacturer']['homepageUrl']
+        d.avg_avail = match['part']['avgAvail']
+        d.total_avail = match['part']['totalAvail']
+
+
+        return d
+
+    def _match_mpn(self, mpn, currency='GBP'):
 
         query = '''
         query Match_part($q: String, $curr: String!, $country: String!, $limit: Int){
@@ -343,8 +359,34 @@ class NexarApiClient(ApiClient):
 
 
 
-    def _search_mpn_availability(self, mpn, currency='GBP'):
-        print(f"_search_mpn_availability mpn = {mpn}")
+    def _search_mpn(self, mpn, currency='GBP'):
+
+        query = '''
+        query searchPart($q: String, $curr: String!, $country: String!, $limit: Int){
+        supSearchMpn(q: $q, currency: $curr, country: $country, limit: $limit) {
+         hits
+         results { ''' +self._get_part()+ '''
+
+             }
+           }
+        }
+        '''
+        var = {
+          "q": mpn,
+          "curr": currency,
+          "country": "GB",
+        }
+
+        _logger.info("VAR IS %s", var)
+        resp = self.execute(query, var)
+
+
+        return resp['supSearchMpn']['results']
+
+
+
+    def _match_mpn_availability(self, mpn, currency='GBP'):
+        print(f"_match_mpn_availability mpn = {mpn}")
         query = '''
         query supSearchMpn($q: String, $curr: String!, $country: String!){
         supSearchMpn(q: $q, currency: $curr, country: $country) {

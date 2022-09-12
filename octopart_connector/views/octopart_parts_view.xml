@@ -66,6 +66,8 @@
                 <field name="est_factory_lead_time"/>
                 <field name="avg_avail"/>
                 <field name="total_avail"/>
+                <field name="min_price"/>
+                <field name="max_price"/>
                 <field name="median_price_1000_converted_currency" widget="monetary" options="{'currency_field': 'currency_id'}" />
                 <field name="free_sample_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="datasheet_url" widget="url" attrs="{'readonly': [('id', '!=', False)]}"/>
