@@ -4,17 +4,15 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
-from odoo.addons.octopart_connector.models.api_client import ApiClient
-from odoo.addons.octopart_connector.models.octopart_client import demo_search_mpn
 
-#TODO: check if it appeares in the project list
-#TODO: testing something else
+
 class OctoPartAvailability(models.Model):
     _name = "octopart.parts.availability"
     _description = "Retrieves availability from octopart by part name"
     _order = "id desc"
 
     avail_id = fields.Many2one("octopart.parts", string="Part name")
+    parent_id = fields.Integer("octopart.parts", related="avail_id.id")
     part_id = fields.Char(readonly=True)
     name = fields.Char(required=True, readonly=True)
     date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)

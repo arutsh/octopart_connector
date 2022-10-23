@@ -79,6 +79,33 @@ class OctoPartParts(models.Model):
                 newParts.append(self.create(self.convertClientPartToComponent(match)))
         return newParts
 
+    #receives list of mpns and returns list of matching components
+    def create_parts_by_matching_mpns(self, mpns, curr='GBP'):
+        '''receives new mpn and creates all matching parts received from client'''
+        print("i am test function called from query:")
+        _logger.info("OCTOPART PARTS: ___searching value")
+        client = self.get_api_client()
+
+
+        newParts = []
+        for mpn in mpns:
+            matches = client.search_mpns(str(mpn), curr)
+            # newParts = []
+
+            for match in matches:
+                part = self.search([('part_id', '=', match.part_id), ('provider', '=', match.provider)])
+                if (part):
+                    newParts.append(part)
+
+                elif(len(mpn) >= 4 ):
+                    # check with 3rd party only if len of the mpn is bigger than 3 symbols
+                    #TODO this can be defined in configuration
+                    newParts.append(self.create(self.convertClientPartToComponent(match)))
+
+
+
+        return newParts
+
 
     def convertClientPartToComponent(self, part):
         '''Converts part received from Client to json for selfcreate function'''

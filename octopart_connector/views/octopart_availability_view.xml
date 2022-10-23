@@ -52,6 +52,7 @@
             <field name="currency_id" />
             <field name="date"/>
             <field name="name"/>
+            <field name="parent_id"/>
             <field name="seller_id" string="Vendor"/>
             <field name="sku"/>
             <field name="moq"/>

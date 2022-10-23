@@ -25,7 +25,6 @@
         "views/octopart_availability_view.xml",
         "views/octopart_manufacturers_view.xml",
         "views/octopart_vendors_view.xml",
-        "views/product_view.xml",
         "views/octopart_settings_view.xml",
         "views/octopart_menu.xml",
 
