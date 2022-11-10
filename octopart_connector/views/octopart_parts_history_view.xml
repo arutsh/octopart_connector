@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<odoo>
+  <record id="octopart_parts_history_action" model="ir.actions.act_window">
+      <field name="name">Parts History</field>
+      <field name="res_model">octopart.parts.history</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'search_default_available': True}</field>
+  </record>
+
+ <record id="octopart_parts_history_view_tree" model="ir.ui.view">
+    <field name="name">octopart.parts.history.tree</field>
+    <field name="model">octopart.parts.history</field>
+    <field name="arch" type="xml">
+      <tree string="Octopart parts History">
+        <field name="date"/>
+        <field name="name"/>
+        <field name="avg_price"/>
+        <field name="est_factory_lead_time"/>
+        <field name="avg_avail"/>
+        <field name="total_avail"/>
+
+      </tree>
+    </field>
+  </record>
+
+ <record id="octopart_parts_history_view_form" model="ir.ui.view">
+    <field name="name">octopart.parts.history.form</field>
+    <field name="model">octopart.parts.history</field>
+    <field name="arch" type="xml">
+      <form string="Parts History">
+        <sheet>
+          <h1>
+            <field name="name"/>
+          </h1>
+          <group>
+            <field name="date"/>
+            <field name="name"/>
+            <field name="avg_price"/>
+            <field name="est_factory_lead_time"/>
+            <field name="avg_avail"/>
+            <field name="total_avail"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+   </record>
+
+</odoo>

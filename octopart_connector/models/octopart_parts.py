@@ -24,6 +24,7 @@ class OctoPartParts(models.Model):
 
     avail_ids = fields.One2many("octopart.parts.availability", "avail_id")
     part_id = fields.Char(string="Provider's part ID", required=True)
+    part_history_ids = fields.One2many("octopart.parts.history", "part_id")
     provider = fields.Char(string="Provider", help="part information was retrie from this provider")
     name = fields.Char(required=True)
     date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)
@@ -95,6 +96,7 @@ class OctoPartParts(models.Model):
             for match in matches:
                 part = self.search([('part_id', '=', match.part_id), ('provider', '=', match.provider)])
                 if (part):
+                    part.fetch_new_history_record()
                     newParts.append(part)
 
                 elif(len(mpn) >= 4 ):
@@ -349,10 +351,11 @@ class OctoPartParts(models.Model):
 
 
 #the function create val dict for create function based on the given part name
-    def getValToCreate(self, mpn, curr='GBP'):
-        #_logger.warning("****getValueToCreate received %s", mpn)
+    def get_val_to_create(self, mpn, curr='GBP'):
+        _logger.warning("****getValueToCreate received %s", mpn)
         part = self._match_parts(mpn, curr)
         val = {}
+        history={}
         val['name'] = mpn
         val['part_id'] = part.part_id
         val['provider'] = part.provider
@@ -364,24 +367,34 @@ class OctoPartParts(models.Model):
             val['image'] = '<img src = "' + part.image_url + '" width="150px">'
 
         val['est_factory_lead_time'] = part.factory_lead_time
+        history['est_factory_lead_time'] = part.factory_lead_time
 
         val['median_price_1000_converted_currency'] = part.median_price
+        history['avg_price'] = part.median_price
 
         val['free_sample_url'] = part.free_sample_url
 
+        val['avg_avail'] = part.avg_avail
+        history['avg_avail'] = part.avg_avail
+
+        val['total_avail'] = part.total_avail
+        history['total_avail'] = part.total_avail
+
         val['datasheet_url'] = part.datasheet_url
 
-        return val
+
+        return (val, history)
 
 
     @api.model
     def create(self, val):
         # if part id is not set, then try to fetch from provider.
         if not val.get('part_id'):
-            val = self.getValToCreate(str(val.get('name').upper()))
-            _logger.info(" *** after matching val is %s", val)
+            val, history = self.get_val_to_create(str(val.get('name').upper()))
+            val['part_history_ids'] = [(0, 0, history)]
+            _logger.info(" *** after matching val is %s", val, history)
 
-
+        # return None
         return super().create(val)
 
 
@@ -460,6 +473,36 @@ class OctoPartParts(models.Model):
             client = self.get_api_client()
             q = client.match_mpn_availability(self.name, self.part_id, self.currency_id.name)
             self.update_availability(q)
+    def fetch_new_history_record(self):
+        #TODO can be modified and run as a part of schedule if user choose....
+        #gets new data from provider to match new stock availability and median price
+        if (self.part_history_ids):
+            dt = max(self.part_history_ids.mapped('date'))
+        else:
+            dt = date.today()-timedelta(days=1)
+        _logger.info("Fetch History: latest date is: %s", dt)
+        #if latest update is smaller then today then refresh data, otherwise do nothing
+        if(dt <  date.today()):
+            _logger.info("API: __adding  history record %s", self.name)
+
+            history = self._match_parts(self.name, 'GBP')
+
+            self.write({
+                'part_history_ids': [(0, 0, {
+                    'avg_price': history.median_price,
+                    'est_factory_lead_time': history.factory_lead_time,
+                    'avg_avail': history.avg_avail,
+                    'total_avail': history.total_avail
+                })],
+                'median_price_1000_converted_currency': history.median_price,
+                'est_factory_lead_time': history.factory_lead_time,
+                'avg_avail': history.avg_avail,
+                'total_avail': history.total_avail
+            })
+
+        return True
+
+
 
 
     def unlink(self):

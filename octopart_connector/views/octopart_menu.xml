@@ -10,6 +10,7 @@
         <menuitem id="octopart_parts_manufacturers_menu_action" action="octopart_parts_manufacturers_action"/>
         <menuitem id="octopart_parts_vendors_menu_action" action="octopart_parts_vendors_action"/>
         <menuitem id="octopart_parts_vendors_category_menu_action" action="octopart_parts_vendors_category_action"/>
+        <menuitem id="octopart_parts_history_menu_action" action="octopart_parts_history_action"/>
     </menuitem>
   </menuitem>
 
