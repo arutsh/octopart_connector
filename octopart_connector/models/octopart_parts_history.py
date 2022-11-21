@@ -13,34 +13,35 @@ from datetime import date, datetime, time, timedelta
 
 _logger = logging.getLogger(__name__)
 
+
+def get_default_date_today():
+    return date.today()
+
+
 class OctoPartPartsHistory(models.Model):
     _name = "octopart.parts.history"
     _description = "Keeps part update history for price, availability, etc"
     _order = "id desc"
-
     def _get_default_currency_id(self):
         return self.env.company.currency_id.id
 
     part_id = fields.Many2one("octopart.parts")
     name = fields.Char(related='part_id.name')
-    date = fields.Date(default=(fields.Datetime.today()),string="Last updated", copy=False)
+    date = fields.Date(string="Last updated", copy=False, default=get_default_date_today())
     est_factory_lead_time = fields.Integer(string="Lead time", default=0, help="Available only for pro subscription")
-    #Returns already converted price for requested currency
-    avg_price = fields.Monetary(string="Median Price", currency_field='currency_id', default=0, help="Median price for 1000qty")
+    # Returns already converted price for requested currency
+    avg_price = fields.Monetary(string="Median Price", currency_field='currency_id', default=0,
+                                help="Median price for 1000qty")
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=_get_default_currency_id)
     avg_avail = fields.Integer(string="Avg Available", help="Average avail of the part", default=None)
     total_avail = fields.Integer(string="Total Available", help="Total Availability in the market", default=None)
 
 
-    def _get_default_currency_id(self):
-        return self.env.company.currency_id.id
 
     @api.model
     def create(self, val):
-
         # if part id is not set, then try to fetch from provider.
         return super().create(val)
-
 
     def unlink(self):
         # Do some business logic, modify vals...

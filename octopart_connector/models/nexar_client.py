@@ -197,8 +197,6 @@ class NexarApiClient(ApiClient):
         matches = self._search_mpn(mpn, currency)
         _logger.info("nexar client matches: %s", matches)
 
-        # ## TODO:  Remove after # DEBUG:
-        # matches = STRING
         return self.filter_parts_searches(matches)
 
     def match_mpns(self, mpn, currency='GBP'):

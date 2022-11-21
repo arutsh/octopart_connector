@@ -59,6 +59,7 @@ class OctoPartVendorsCategory(models.Model):
     _order = "id desc"
 
     vendors_ids = fields.One2many('octopart.parts.vendors', 'category_id')
+    # partner_ids = fields.One2many('res.partner', 'vendor_category_id')
     name = fields.Char(required=True)
     #TODO: desc is temp field to match values received from JS.
     #IF JS is changed so instead id was chosen from the select... then no need for this field.
