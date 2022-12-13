@@ -28,6 +28,9 @@
         "views/octopart_vendors_view.xml",
         "views/octopart_settings_view.xml",
         "views/octopart_menu.xml",
+        "views/product_views.xml",
+        "views/products_history_view.xml",
+
 
     ],
     'qweb': ['static/src/xml/*.xml'],

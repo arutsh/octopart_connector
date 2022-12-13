@@ -15,6 +15,8 @@
                       <group attrs="{'invisible':[('octopart_linked','!=', True)]}">
                             <field name="min_price" />
                             <field name="avg_price" />
+                            <field name="avg_avail" />
+                            <field name="total_avail" />
                             <field name="max_price" />
                             <field name="min_factory_lead_time" />
                             <field name="bom_count" />

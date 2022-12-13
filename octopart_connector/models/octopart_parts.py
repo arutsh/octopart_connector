@@ -120,13 +120,13 @@ class OctoPartParts(models.Model):
 
         if self.part_history_ids:
             dt = max(self.part_history_ids.mapped('date'))
-            print("update_part_history -1 ", dt)
+            #print("update_part_history -1 ", dt)
         else:
             dt = date.today() - timedelta(days=1)
-            print("update_part_history -2 ", dt, "today is ", date.today())
+            #print("update_part_history -2 ", dt, "today is ", date.today())
 
         # if latest update is smaller then today then refresh data, otherwise do nothing
-        print("Update part history, ", dt,  date.today())
+        #print("Update part history, ", dt,  date.today())
         if dt < date.today():
             self.create_history_record(part)
 

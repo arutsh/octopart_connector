@@ -12,3 +12,4 @@ from . import octopart_vendors
 from . import product
 from . import res_config_settings
 from . import octopart_parts_history
+from . import products_history
