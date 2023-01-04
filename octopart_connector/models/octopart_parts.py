@@ -490,6 +490,7 @@ class OctoPartParts(models.Model):
             client = self.get_api_client()
             q = client.match_mpn_availability(self.name, self.part_id, self.currency_id.name)
             self.update_availability(q)
+            self.fetch_new_history_record()
 
     def fetch_new_history_record(self):
         # TODO can be modified and run as a part of schedule if user choose....
@@ -511,15 +512,8 @@ class OctoPartParts(models.Model):
 
 
 
-    @api.model
     def unlink(self):
-        # Do some business logic, modify vals...
-        ...
-        # Then call super to execute the parent method
-        # for record in self:
-        # if (record.state == 'new'):
-        # raise UserError('You can not delete property at new state')
-        #    return True
+
         for record in self:
             if (record.avail_ids):
                 raise UserError(

@@ -2,12 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import logging
-from pathlib import Path
-
-from datetime import timedelta
 from odoo import api, fields, models
-from odoo.tools.float_utils import float_round, float_is_zero
-from datetime import date, datetime, time, timedelta
+from datetime import date
 
 _logger = logging.getLogger(__name__)
 

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<odoo>
+  <menuitem id="product_history"
+            name="Product History"
+            parent="octopart_first_level_menu"
+            action="products_history_action"
+            sequence="100"/>
+</odoo>
