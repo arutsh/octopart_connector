@@ -46,6 +46,7 @@ class ApiClient():
             print(f" can not get response from octopart: {e.read()}")
             print('')
             raise e
+
     #new API client has to request this  for each part and return dict according to defined struct
     def get_part_data(self):
         return PartData()

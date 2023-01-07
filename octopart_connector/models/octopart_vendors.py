@@ -5,10 +5,6 @@ import logging
 from pathlib import Path
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare, float_is_zero
-from odoo.addons.octopart_connector.models.api_client import ApiClient
-from odoo.addons.octopart_connector.models.octopart_client import demo_match_mpns, demo_search_mpn
 
 _logger = logging.getLogger(__name__)
 

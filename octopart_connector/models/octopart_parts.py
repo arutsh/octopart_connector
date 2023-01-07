@@ -91,21 +91,21 @@ class OctoPartParts(models.Model):
     # receives list of mpns and returns list of matching components
     def create_parts_by_matching_mpns(self, mpns, curr='GBP'):
         '''receives new mpn and creates all matching parts received from client'''
-        print("i am test function called from query:")
+        # print("i am test function called from query:")
         _logger.info("OCTOPART PARTS: ___searching value")
         client = self.get_api_client()
 
         newParts = []
         for mpn in mpns:
             matches = client.search_mpns(str(mpn).upper(), curr)
-            print("searching part , ", str(mpn).upper())
+            # print("searching part , ", str(mpn).upper())
             # newParts = []
 
             for match in matches:
                 part = self.search([('part_id', '=', match.part_id), ('provider', '=', match.provider)])
-                print("seearched part is: ", part)
+                # print("seearched part is: ", part)
                 if part:
-                    print("part exist = ", match)
+                    # print("part exist = ", match)
                     part.update_part_history(match)
                     newParts.append(part)
 
