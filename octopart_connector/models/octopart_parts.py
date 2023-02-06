@@ -69,6 +69,10 @@ class OctoPartParts(models.Model):
 
     seller_category_ids = fields.Many2many('octopart.parts.vendors.category', string="Category")
 
+    _sql_constraints = [
+        ('check_product_id', 'unique(part_id, provider)',
+         'part_id and provider has to be unique.')
+    ]
 
     def _set_default_date(self):
         for record in self:
@@ -76,7 +80,7 @@ class OctoPartParts(models.Model):
     def create_parts_by_matching_mpn(self, mpn, curr='GBP'):
         '''receives new mpn and creates all patching parts received from client'''
         print("i am test function called from query:", mpn)
-        _logger.info("OCTOPART PARTS: ___searching value")
+        _logger.info("OCTOPART PARTS: ___searching value ")
         client = self.get_api_client()
         matches = client.search_mpns(str(mpn), curr)
         newParts = []
@@ -92,27 +96,30 @@ class OctoPartParts(models.Model):
     def create_parts_by_matching_mpns(self, mpns, curr='GBP'):
         '''receives new mpn and creates all matching parts received from client'''
         # print("i am test function called from query:")
-        _logger.info("OCTOPART PARTS: ___searching value")
+        _logger.info("OCTOPART PARTS: ___searching value mpns")
         client = self.get_api_client()
-
         newParts = []
         for mpn in mpns:
+
             matches = client.search_mpns(str(mpn).upper(), curr)
-            # print("searching part , ", str(mpn).upper())
+            print("searching part , ", str(mpn).upper(), matches)
             # newParts = []
+            #if error was raised
+            if matches:
+                for match in matches:
+                    # print("match part is", match)
+                    part = self.search([('part_id', '=', match.part_id), ('provider', '=', match.provider)])
+                    print(match, "searched part is: ", part)
+                    if part:
+                        # print("part exist = ", match)
+                        part.update_part_history(match)
+                        newParts.append(part)
 
-            for match in matches:
-                part = self.search([('part_id', '=', match.part_id), ('provider', '=', match.provider)])
-                # print("seearched part is: ", part)
-                if part:
-                    # print("part exist = ", match)
-                    part.update_part_history(match)
-                    newParts.append(part)
+                    elif len(mpn) >= 4:
+                        # check with 3rd party only if len of the mpn is bigger than 3 symbols
+                        # TODO this can be defined in configuration
+                        newParts.append(self.create(self.convertClientPartToComponent(match)))
 
-                elif len(mpn) >= 4:
-                    # check with 3rd party only if len of the mpn is bigger than 3 symbols
-                    # TODO this can be defined in configuration
-                    newParts.append(self.create(self.convertClientPartToComponent(match)))
 
         return newParts
 

@@ -47,10 +47,12 @@ class OctopartApiClient(ApiClient):
     def match_mpns(self, mpn, currency='GBP'):
         query = OctopartGraphQL.search_mpn(self.subscription, mpn, currency)
         matches = json.loads(self.execute(query['query_body'], query['variables']))
+
         for i in query['nested_data']:
             matches = matches[i]
-        # ## TODO:  Remove after # DEBUG:
-        # matches = STRING
+
+
+
         return self.filter_part_matches(matches, mpn)
 
     """
@@ -64,15 +66,17 @@ class OctopartApiClient(ApiClient):
     def search_mpns(self, mpn, currency='GBP'):
 
         query = OctopartGraphQL.search_mpn(self.subscription, mpn, currency)
+        # print("octopart search mpn", mpn)
         matches = json.loads(self.execute(query['query_body'], query['variables']))
+        print("octopart search mpn matches", matches)
+
         for i in query['nested_data']:
             matches = matches[i]
-        # ## TODO:  Remove after # DEBUG:
-        # matches = STRING
-        # print("octopart_client matches ", matches)
 
+        if matches:
+            return self.filter_parts_searches(matches)
 
-        return self.filter_parts_searches(matches)
+        return []
 
 
     """
@@ -193,11 +197,11 @@ class OctopartApiClient(ApiClient):
     def filter_parts_searches(self, matches):
         d = self.get_part_data()
         d_list = []
-        print("filter part searches", d_list)
+        # print("filter part matches", matches)
         for match in matches:
             d_list.append(self.translateToPartData(match))
 
-        print("filter part searches" , d_list)
+        # print("filter part searches" , d_list)
         return d_list
 
     def translateToPartData(self, match):
