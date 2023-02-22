@@ -89,7 +89,9 @@ class OctoPartParts(models.Model):
             if (part):
                 newParts.append(part)
             else:
-                newParts.append(self.create(self.convertClientPartToComponent(match)))
+                p = self.create(self.convertClientPartToComponent(match))
+                p.manufacturer_id = p.add_contact(match.manufacturer, True)
+                newParts.append(p)
         return newParts
 
     # receives list of mpns and returns list of matching components
@@ -118,7 +120,9 @@ class OctoPartParts(models.Model):
                     elif len(mpn) >= 4:
                         # check with 3rd party only if len of the mpn is bigger than 3 symbols
                         # TODO this can be defined in configuration
-                        newParts.append(self.create(self.convertClientPartToComponent(match)))
+                        p = self.create(self.convertClientPartToComponent(match))
+                        p.manufacturer_id = p.add_contact(match.manufacturer, True)
+                        newParts.append(p)
 
 
         return newParts
@@ -158,7 +162,6 @@ class OctoPartParts(models.Model):
             'name': part.name,
             'part_id': part.part_id,
             'provider': part.provider,
-            'manufacturer_id': self.add_contact(part.manufacturer, True),
             'manufacturer_url': part.manufacturer_url,
             'description': part.description,
             'octopart_url': part.provider_url,
@@ -339,6 +342,31 @@ class OctoPartParts(models.Model):
 
     def add_contact(self, contact, manufacturer=False):
 
+        '''
+        1. create supplier attribute
+        :param contact:
+        :param manufacturer:
+        :return:
+        '''
+        category = None
+        #1. find correct vendor category id
+        if manufacturer:
+            category = 'manufacturer'
+        elif contact.is_authorized:
+            category = 'authorised'
+        elif contact.is_broker:
+            category = 'broker'
+
+
+
+
+        vendor_attr_id = self.env['vendors.attributes'].create({
+            'name': contact.name,
+            'is_verified': contact.is_verified or None,
+            'vendor_category': category
+        }).id
+
+
         return self.env['res.partner'].create({
             'contact_id': contact.id,
             'name': contact.name,
@@ -349,7 +377,9 @@ class OctoPartParts(models.Model):
             'website': contact.homepage_url or None,
             'provider': self.provider,
             'is_manufacturer': manufacturer,
-            'company_type': 'company'
+            'company_type': 'company',
+            'is_supplier': True,
+            'vendor_attribute_id': vendor_attr_id
         }).id
 
     # new module parts category has to be created
@@ -441,7 +471,6 @@ class OctoPartParts(models.Model):
 
     # update availability with given query result
     def update_availability(self, result):
-        print(f"update record, received result = {type(result)}")
         avail_ids = []
         part_id = result.part_id
         name = result.mpn
@@ -480,7 +509,7 @@ class OctoPartParts(models.Model):
                         'batch_qty': batch_qty,
                         'offer_url': offer_url
                     })
-                    print(f"creating new record = {ret}")
+                    # print(f"creating new record = {ret}")
 
     def check_availability(self):
         # get the latest update of available components
