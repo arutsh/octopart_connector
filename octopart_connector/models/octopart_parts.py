@@ -370,13 +370,13 @@ class OctoPartParts(models.Model):
         return self.env['res.partner'].create({
             'contact_id': contact.id,
             'name': contact.name,
-            'is_verified': contact.is_verified or None,
-            'is_authorized': contact.is_authorized or None,
-            'is_broker': contact.is_broker or None,
+            # 'is_verified': contact.is_verified or None,
+            # 'is_authorized': contact.is_authorized or None,
+            # 'is_broker': contact.is_broker or None,
             'is_distributor_api': contact.is_distributor_api or None,
             'website': contact.homepage_url or None,
             'provider': self.provider,
-            'is_manufacturer': manufacturer,
+            # 'is_manufacturer': manufacturer,
             'company_type': 'company',
             'is_supplier': True,
             'vendor_attribute_id': vendor_attr_id
