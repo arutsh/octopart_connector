@@ -8,7 +8,7 @@
 * Checks stock availability for the linked parts
 * Computes Min cost of the product based on the data retrieved from octopart
 * Stores all historical prices on odoo for future reports
-* Allows to create Group of Vendors (e.g. Manufacturer, Authorised distributor, etc...) and group vendors
+* Allows to create Group of Vendors (e.g. Manufacturer, Authorised distributor, etc...) 
 
 
 
